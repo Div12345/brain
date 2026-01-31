@@ -1,39 +1,6 @@
 {
-  "hooks": {
-    "SessionStart": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "echo \"--- Brain Context ($(date +%H:%M)) ---\" && head -25 \"$CLAUDE_PROJECT_DIR/context/priorities.md\" 2>/dev/null | tail -n +10 || echo 'No priorities file'",
-            "timeout": 5,
-            "statusMessage": "Loading brain context..."
-          }
-        ]
-      }
-    ],
-    "UserPromptSubmit": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "cat \"$CLAUDE_PROJECT_DIR/context/active-agent.md\" 2>/dev/null || true",
-            "timeout": 3
-          }
-        ]
-      }
-    ],
-    "Stop": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "mkdir -p \"$CLAUDE_PROJECT_DIR/logs\" && echo \"$(date -Iseconds) | Session stop\" >> \"$CLAUDE_PROJECT_DIR/logs/cc-sessions.log\"",
-            "timeout": 5,
-            "async": true
-          }
-        ]
-      }
-    ]
+  "enabledPlugins": {
+    "hookify@claude-plugins-official": true,
+    "claude-md-management@claude-plugins-official": true
   }
 }
