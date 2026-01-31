@@ -7,6 +7,7 @@ aliases:
   - index
   - start
   - vault home
+updated: 2026-01-31T09:44
 ---
 
 # Brain Vault
@@ -16,31 +17,37 @@ Self-evolving AI assistant system coordinating multiple Claude interfaces.
 ## Quick Navigation
 
 ### Active Work
-- [[context/priorities]] - What matters now
-- [[tasks/pending/]] - Task queue
-- [[prompts/pending]] - Questions for user
+- [[context/predictions]] - Tomorrow's likely needs
+- [[context/session-state]] - Current state (compaction-resilient)
+- [[prompts/pending]] - 5 questions for user
+- [[ACTIVE]] - Work coordination
 
-### Knowledge
+### Research (New)
+- [[knowledge/research/recursive-self-improvement]] - Self-improvement patterns
+- [[knowledge/research/proactive-assistant-patterns]] - Anticipatory AI
+- [[knowledge/research/multi-agent-coordination]] - Agent coordination
+- [[knowledge/research/task-automation-scheduling]] - Scheduling options
+- [[knowledge/research/pkm-mcp-servers]] - PKM MCP overview
+- [[knowledge/research/obsidian-mcp-options]] - Obsidian MCP comparison
 - [[knowledge/research/ai-memory-systems]] - Memory architecture
-- [[inspirations/claude-code-ecosystem]] - CC tools & patterns
+- [[knowledge/research/claude-code-ecosystem]] - CC tools
 
 ### Agents
 - [[agents/overnight]] - Autonomous overnight agent
 
 ### Meta
-- [[meta/obsidian-conventions]] - Vault formatting rules
-- [[CLAUDE]] - CC context file
+- [[meta/obsidian-conventions]] - Vault formatting
+- [[CLAUDE]] - CC entry point
+- [[context/self-improvement-metrics]] - Session metrics
 
 ## Graph Entry Points
-
-Start exploring from:
 - `#research` - External findings
-- `#knowledge` - Synthesized insights
+- `#context` - Shared state
 - `#task` - Work items
-- `#agent` - Agent definitions
 
 ## Recent Activity
-
-- 2026-01-31: Obsidian conversion in progress
-- 2026-01-31: CC ecosystem research complete
-- 2026-01-31: Memory systems research complete
+- 2026-01-31: Recursive self-improvement research
+- 2026-01-31: Proactive assistant patterns
+- 2026-01-31: Multi-agent coordination infrastructure
+- 2026-01-31: Predictions + metrics system
+- 2026-01-31: PKM MCP overview
