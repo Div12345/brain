@@ -16,7 +16,7 @@ The system should proactively:
 ## Question Types
 
 | Type | Purpose | Example |
-|------|---------|---------|
+|------|---------|---------| 
 | **Clarification** | Understand ambiguous patterns | "I noticed X happens often. Is this intentional?" |
 | **Validation** | Confirm predictions | "It seems like you usually need Y on Mondays. Correct?" |
 | **Context** | Gather missing info | "What's the relationship between project A and B?" |
@@ -52,7 +52,94 @@ The system should proactively:
 
 ## Active Questions
 
-(None yet - first run will generate some)
+### Q-2026-01-31-01: Overnight Schedule Preference
+
+**Type:** context
+**Priority:** high
+**From:** Orchestration Architect Agent
+
+**Question:**
+What's your preferred overnight run schedule?
+
+**Why I'm asking:**
+Need to configure Windows Task Scheduler correctly. This affects when autonomous work happens.
+
+**Options:**
+- A) Daily at 2 AM → Maximum automation, runs every night
+- B) Weeknights only (Mon-Fri) → Preserves weekend mornings
+- C) On-demand only → You trigger when ready
+- D) Other schedule → Specify
+
+---
+
+### Q-2026-01-31-02: Obsidian Vault Location
+
+**Type:** context
+**Priority:** high
+**From:** Orchestration Architect Agent
+
+**Question:**
+What's the exact path to your main Obsidian vault?
+
+**Why I'm asking:**
+The CC Vault Analyst agent needs this to analyze folder structure. Desktop Commander MCP also needs it for file operations.
+
+**Example:** `D:\Obsidian\MainVault` or `C:\Users\[name]\Documents\Obsidian\vault`
+
+---
+
+### Q-2026-01-31-03: Failed Task Notification
+
+**Type:** validation
+**Priority:** medium
+**From:** Orchestration Architect Agent
+
+**Question:**
+If an overnight task fails, should the system notify you immediately or batch failures for morning review?
+
+**Why I'm asking:**
+Affects how error handling works in the overnight PowerShell script.
+
+**Options:**
+- A) Immediate notification (email/desktop alert) → Requires additional setup
+- B) Batch for morning → Just log errors, you review logs
+- C) Critical only immediate → Define what's "critical"
+
+---
+
+### Q-2026-01-31-04: Off-Limits Tasks
+
+**Type:** context
+**Priority:** medium
+**From:** Orchestration Architect Agent
+
+**Question:**
+Are there any tasks that should NEVER run unattended (always require your presence)?
+
+**Why I'm asking:**
+Safety boundaries for autonomous operation. Some operations might need human oversight.
+
+**Examples that might need oversight:**
+- Anything touching work files?
+- Financial documents?
+- Deleting/moving files?
+- Git pushes to remote?
+
+---
+
+### Q-2026-01-31-05: Brain Repo Location
+
+**Type:** context
+**Priority:** high
+**From:** Orchestration Architect Agent
+
+**Question:**
+Where is (or will be) the brain repo cloned locally on your Windows machine?
+
+**Why I'm asking:**
+The Windows Task Scheduler configs assume `C:\brain`. If different, need to update paths.
+
+**Example:** `C:\brain`, `C:\Users\[name]\Projects\brain`, `D:\AI\brain`
 
 ---
 
