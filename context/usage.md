@@ -1,3 +1,13 @@
+---
+created: 2026-01-31
+tags:
+  - context
+  - usage
+  - limits
+  - optimization
+updated: 2026-01-31T09:55
+---
+
 # Usage & Limits Tracking
 
 > Be aware of Claude usage limits and optimize accordingly.

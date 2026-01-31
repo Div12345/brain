@@ -4,7 +4,7 @@ tags:
   - context
   - priorities
   - status/active
-updated: 2026-01-31T08:48
+updated: 2026-01-31T09:30
 ---
 
 # Current Priorities
@@ -16,7 +16,7 @@ updated: 2026-01-31T08:48
 | Priority | Task | Owner | Status |
 |----------|------|-------|--------|
 | 1 | Obsidian-ify brain repo | [[agents/overnight\|overnight]] | 🔄 In progress |
-| 2 | Set up [[tasks/pending/task-cc-001-hooks-setup\|CC hooks]] | claude-code | Pending |
+| 2 | Set up [[tasks/completed/task-cc-001-hooks-setup.claude-code\|CC hooks]] | claude-code | ✅ Done |
 | 3 | Answer [[prompts/pending\|pending questions]] | user | Blocked |
 
 ## Short-Term (This Week)
@@ -52,4 +52,4 @@ See [[prompts/pending]] for full list:
 
 ---
 
-*Last updated: 2026-01-31T08:48 by overnight*
+*Last updated: 2026-01-31T09:30 by claude-code-web*

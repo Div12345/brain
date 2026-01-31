@@ -1,3 +1,12 @@
+---
+created: 2026-01-31
+tags:
+  - tasks
+  - documentation
+  - queue
+updated: 2026-01-31T10:05
+---
+
 # Task Queue System
 
 > Async coordination between agents via file-based tasks.

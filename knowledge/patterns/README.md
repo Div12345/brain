@@ -1,6 +1,15 @@
+---
+created: 2026-01-31
+tags:
+  - knowledge
+  - patterns
+  - documentation
+updated: 2026-01-31T09:45
+---
+
 # Patterns
 
-Learned patterns from vault analysis and research.
+Learned patterns from vault analysis and research. Related to [[knowledge/research/ai-memory-systems|L1 abstracted knowledge]].
 
 ## Categories
 

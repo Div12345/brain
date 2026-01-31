@@ -1,3 +1,12 @@
+---
+created: 2026-01-31
+tags:
+  - meta
+  - improvements
+  - changelog
+updated: 2026-01-31T10:00
+---
+
 # System Improvements
 
 > Agents write meta-observations here. What would make future runs better?
@@ -19,6 +28,7 @@
 | Date | Change | By |
 |------|--------|-----|
 | 2026-01-31 | Initial structure created | setup |
+| 2026-01-31 | Added CC hooks, Linux runner, Obsidian frontmatter | claude-code-web |
 
 ---
 *This file tracks the evolution of the brain system itself.*

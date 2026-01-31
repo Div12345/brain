@@ -68,5 +68,5 @@ Path: `~/.claude/agents/`
 
 ## Related
 - [[inspirations/claude-code-ecosystem]] - Deep dive research
-- [[tasks/pending/task-cc-001-hooks-setup]] - Hook setup task
+- [[tasks/completed/task-cc-001-hooks-setup.claude-code]] - Hook setup (done)
 - [[context/capabilities]] - System capabilities

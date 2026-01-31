@@ -1,7 +1,20 @@
+---
+created: 2026-01-31
+tags:
+  - research
+  - orchestration
+  - tools
+  - claude-code
+updated: 2026-01-31T09:50
+agent: desktop-architect
+aliases:
+  - claude-flow research
+  - ralph pattern
+---
+
 # Orchestration Research
 
 > Desktop agent: document research findings here.
-> Updated: 2026-01-31
 
 ## Executive Summary
 

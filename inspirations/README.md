@@ -1,3 +1,12 @@
+---
+created: 2026-01-31
+tags:
+  - inspirations
+  - research
+  - documentation
+updated: 2026-01-31T09:50
+---
+
 # External Inspirations
 
 > Learn from the best. GitHub repos, Reddit workflows, blog posts, tools.

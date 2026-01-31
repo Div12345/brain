@@ -1,3 +1,16 @@
+---
+created: 2026-01-31
+tags:
+  - design
+  - orchestration
+  - architecture
+updated: 2026-01-31T09:45
+agent: desktop-architect
+aliases:
+  - orchestration design
+  - task queue design
+---
+
 # Orchestration Layer Design
 
 > Practical design for coordinating Claude Desktop + Claude Code via this repo.
@@ -224,13 +237,13 @@ Integrate `tosage` or `claude-pulse` to auto-update metrics.
 
 ### Phase 1: Basic Coordination (This Week)
 - [x] Research complete
-- [ ] Create `tasks/` directory structure
-- [ ] Write first overnight task
+- [x] Create `tasks/` directory structure
+- [x] Write first overnight task (hooks setup)
 - [ ] Test Windows Task Scheduler
 
 ### Phase 2: Automated Scheduling (Next)
 - [ ] Deploy PowerShell scheduled job
-- [ ] Add CC startup hook
+- [x] Add CC startup hook (SessionStart in `.claude/settings.json`)
 - [ ] Test full overnight run
 
 ### Phase 3: Usage Awareness

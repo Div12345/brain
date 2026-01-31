@@ -1,3 +1,16 @@
+---
+created: 2026-01-31
+tags:
+  - meta
+  - safety
+  - constraints
+  - boundaries
+updated: 2026-01-31T10:00
+aliases:
+  - safety rules
+  - harm prevention
+---
+
 # Safety Constraints
 
 > What can NEVER be harmed. Read this before ANY write operation.

@@ -1,6 +1,15 @@
+---
+created: 2026-01-31
+tags:
+  - knowledge
+  - documentation
+  - memory
+updated: 2026-01-31T09:50
+---
+
 # Knowledge Directory
 
-Agents write discovered insights here. This is the **compounding memory** of the system.
+Agents write discovered insights here. This is the **compounding memory** of the system - the [[knowledge/research/ai-memory-systems|L1 layer]].
 
 ## Structure
 

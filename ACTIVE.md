@@ -5,7 +5,7 @@ tags:
   - active-work
   - status
 status: active
-updated: 2026-01-31T09:43
+updated: 2026-01-31T10:50
 aliases:
   - active work
   - current tasks
@@ -19,14 +19,25 @@ aliases:
 
 | Agent | Task | Started | Status |
 |-------|------|---------|--------|
-| overnight-A (Desktop) | Research + infrastructure | 2026-01-31T09:30 | 🔄 Active |
+| claude-code-web | Hooks + messaging + orchestration | 2026-01-31 09:20 | ✅ Complete |
+| overnight-A (Desktop) | Research + infrastructure | 2026-01-31T09:30 | ✅ Complete |
 
 ## Recent Commits This Session
 
+### claude-code-web
+1. CC hooks setup (.claude/settings.json)
+2. Obsidian frontmatter conversion (all files)
+3. Linux overnight runner + systemd configs
+4. Inter-agent messaging system (messages/)
+5. Auto-continuation orchestration
+
+### overnight-A (Desktop)
 1. Research: Recursive self-improvement patterns
 2. Self-improvement: Add metrics and retrospective tracking
 3. Research: Proactive assistant patterns
 4. Proactive: Generate predictions for tomorrow
+5. Research: Context window management
+6. Pattern: Multi-agent coordination via GitHub blackboard
 
 ## Task Ownership
 
@@ -34,6 +45,9 @@ aliases:
 |------|-------|-------|
 | knowledge/research/ | overnight-A | Research docs |
 | context/ | overnight-A | Infrastructure |
+| .claude/ | claude-code-web | CC hooks |
+| messages/ | claude-code-web | Inter-agent messaging |
+| tools/orchestration/ | claude-code-web | Auto-continuation |
 | prompts/ | Both | Questions |
 | logs/ | Both | Activity logs |
 
@@ -49,7 +63,8 @@ aliases:
 - [[context/active-agents]] - Detailed agent tracking
 - [[context/session-state]] - Recovery state
 - [[context/handoff]] - Handoff protocol
+- [[messages/README]] - Inter-agent messaging
 
 ---
 
-*Last updated: 2026-01-31T09:43 by overnight-A*
+*Last updated: 2026-01-31T10:50 by merge (claude-code-web + overnight-A)*
