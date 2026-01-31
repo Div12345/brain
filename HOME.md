@@ -41,6 +41,14 @@ Start exploring from:
 
 ## Recent Activity
 
-- 2026-01-31: Obsidian conversion in progress
-- 2026-01-31: CC ecosystem research complete
-- 2026-01-31: Memory systems research complete
+- 2026-01-31 10:15: CC hooks setup complete, Linux runner created
+- 2026-01-31 09:30: Obsidian frontmatter conversion complete (all files)
+- 2026-01-31 08:30: CC ecosystem research complete
+- 2026-01-31 02:00: Memory systems research complete
+
+## What's Ready
+
+- [x] CC hooks (SessionStart shows priorities)
+- [x] Obsidian format (all files have frontmatter)
+- [x] Overnight runners (Windows + Linux)
+- [ ] Actual overnight test (needs user to run)

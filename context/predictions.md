@@ -50,7 +50,29 @@ The system learns patterns and predicts:
 
 ## Current Predictions
 
-(First run will generate these from vault analysis)
+### P-2026-01-31-01: First Overnight Test Needed
+
+**Type:** near-term
+**Confidence:** high (90%)
+**Based on:** System setup complete, overnight runner created, but never tested on actual hardware
+**Action:** Prepare test checklist for overnight runner validation
+**Validate by:** User runs overnight-brain.sh or overnight-brain.ps1 successfully
+
+### P-2026-01-31-02: User Questions Will Block Progress
+
+**Type:** immediate
+**Confidence:** high (95%)
+**Based on:** 5 questions in [[prompts/pending]] without answers
+**Action:** Highlight questions Q-01, Q-02, Q-05 as blocking automation setup
+**Validate by:** User answers questions in prompts/answered.md
+
+### P-2026-01-31-03: Graph View Testing Needed
+
+**Type:** near-term
+**Confidence:** medium (70%)
+**Based on:** Obsidian config created, all files have frontmatter, but graph untested
+**Action:** User opens brain repo in Obsidian, checks graph view connectivity
+**Validate by:** User confirms graph view shows connected nodes
 
 ---
 
