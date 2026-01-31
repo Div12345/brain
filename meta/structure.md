@@ -1,3 +1,12 @@
+---
+created: 2026-01-31
+tags:
+  - meta
+  - documentation
+  - structure
+updated: 2026-01-31T09:45
+---
+
 # System Structure
 
 > Self-documentation. Agents update this when they create new directories/patterns.

@@ -1,0 +1,13 @@
+# Systemd timer for brain overnight runner
+# Runs daily at 2:00 AM
+
+[Unit]
+Description=Brain Overnight Runner Timer
+
+[Timer]
+OnCalendar=*-*-* 02:00:00
+Persistent=true
+RandomizedDelaySec=300
+
+[Install]
+WantedBy=timers.target

@@ -1,3 +1,16 @@
+---
+created: 2026-01-31
+tags:
+  - meta
+  - orchestration
+  - architecture
+  - multi-agent
+updated: 2026-01-31T10:00
+aliases:
+  - orchestration
+  - multi-interface routing
+---
+
 # Orchestration Architecture
 
 > The brain coordinates multiple AI interfaces, routes work intelligently, and evolves its own coordination capabilities.

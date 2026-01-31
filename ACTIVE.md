@@ -1,3 +1,12 @@
+---
+created: 2026-01-31
+tags:
+  - coordination
+  - active-work
+  - status
+updated: 2026-01-31T10:00
+---
+
 # Active Work Coordination
 
 > Agents check this file to avoid duplicating work. Update when you start/finish tasks.
@@ -6,8 +15,7 @@
 
 | Agent | Task | Started | Status |
 |-------|------|---------|--------|
-| Claude Code | Vault analysis (overnight.md) | 2026-01-31 ~02:30 | 🔄 Starting |
-| Claude Desktop | Orchestration research/design | 2026-01-31 ~02:30 | 🔄 Starting |
+| claude-code-web | Hooks setup + Obsidian conversion | 2026-01-31 09:20 | ✅ Complete |
 
 ## Task Ownership
 
@@ -32,4 +40,4 @@
 
 ---
 
-*Last updated: Pre-flight*
+*Last updated: 2026-01-31T10:00 by claude-code-web*

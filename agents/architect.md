@@ -1,3 +1,15 @@
+---
+created: 2026-01-31
+tags:
+  - agent
+  - tools
+  - building
+updated: 2026-01-31T10:05
+aliases:
+  - tool builder
+  - builder agent
+---
+
 # Architect Agent
 
 > Builds tools, MCPs, plugins, commands, and configs when gaps are identified.

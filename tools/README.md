@@ -1,3 +1,12 @@
+---
+created: 2026-01-31
+tags:
+  - tools
+  - documentation
+  - framework
+updated: 2026-01-31T10:05
+---
+
 # Tools Building Framework
 
 > When the system identifies a gap, it builds tools to fill it.

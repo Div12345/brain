@@ -1,3 +1,12 @@
+---
+created: 2026-01-31
+tags:
+  - context
+  - predictions
+  - anticipation
+updated: 2026-01-31T09:55
+---
+
 # Predictions
 
 > What the system anticipates you'll need. Tested and refined over time.

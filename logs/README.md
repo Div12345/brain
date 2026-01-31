@@ -1,6 +1,14 @@
+---
+created: 2026-01-31
+tags:
+  - logs
+  - documentation
+updated: 2026-01-31T09:50
+---
+
 # Logs Directory
 
-Agents append activity logs here after each run.
+Agents append activity logs here after each run. This is the [[knowledge/research/ai-memory-systems|L0 raw data layer]].
 
 ## Format
 `YYYY-MM-DD-HHMM-agentname.md`

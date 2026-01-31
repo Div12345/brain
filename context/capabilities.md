@@ -68,7 +68,7 @@ See [[context/off-limits]] for full list.
 - [x] Pattern extraction
 - [x] Agent architecture defined
 - [x] Obsidian format conversion
-- [ ] CC hooks integrated
+- [x] CC hooks integrated (`.claude/settings.json`)
 
 ### Phase 2: Prediction
 - [ ] Morning summaries

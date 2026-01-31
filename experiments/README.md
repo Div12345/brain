@@ -1,6 +1,14 @@
+---
+created: 2026-01-31
+tags:
+  - experiments
+  - documentation
+updated: 2026-01-31T09:45
+---
+
 # Experiments
 
-Hypothesis testing for brain system improvements.
+Hypothesis testing for brain system improvements. See [[knowledge/research/ai-memory-systems]] for theoretical background.
 
 ## Format
 

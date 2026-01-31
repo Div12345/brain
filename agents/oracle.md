@@ -1,3 +1,15 @@
+---
+created: 2026-01-31
+tags:
+  - agent
+  - predictions
+  - anticipation
+updated: 2026-01-31T10:05
+aliases:
+  - prediction agent
+  - anticipatory assistant
+---
+
 # Oracle Agent
 
 > Predicts what you'll need before you ask. Prepares resources, surfaces information, anticipates friction.
