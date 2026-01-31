@@ -1,29 +1,45 @@
-# Active Handoffs
-
-> Write here when passing work to another interface.
-
+---
+created: 2026-01-31
+tags:
+  - context
+  - coordination
+  - handoff
+status: active
+aliases:
+  - agent handoff
+  - coordination
 ---
 
-(No active handoffs)
+# Agent Handoff Protocol
 
----
+## Current Handoff
 
-## Handoff Format
+| Field | Value |
+|-------|-------|
+| From | overnight (Desktop Claude) |
+| To | Any agent |
+| Time | 2026-01-31T08:55 |
+| Status | Active - Obsidian conversion |
 
-```markdown
-## Handoff: [brief title]
+## Context
+Converting brain repo to Obsidian vault format. Frequent commits for coordination.
 
-**From:** [interface]
-**To:** [interface]
-**Time:** [ISO8601]
-**Urgency:** [high/medium/low]
+## Key Files Modified This Session
+- [[context/session-state]] - Recovery state
+- [[logs/2026-01-31-overnight]] - Session log
+- Multiple context/ files - Obsidian format
 
-### Context
-What was done, what's needed
+## Pending Actions
+- [ ] Complete remaining file conversions
+- [ ] Create [[prompts/pending]] with questions
+- [ ] Test graph view
 
-### Files
-- path/to/relevant/file.md
+## For Next Agent
+1. Read [[context/session-state]] first
+2. Check [[context/priorities]]
+3. Review recent commits on GitHub
+4. Continue from pending list
 
-### Expected Action
-What the receiving agent should do
-```
+## Related
+- [[context/session-state]] - Compaction-resilient state
+- [[agents/overnight]] - Current agent
