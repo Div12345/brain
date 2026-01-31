@@ -4,7 +4,7 @@ tags:
   - context
   - coordination
   - status/active
-updated: 2026-01-31T09:30
+updated: 2026-01-31T10:15
 ---
 
 # Active Agent
@@ -15,14 +15,14 @@ updated: 2026-01-31T09:30
 
 | Field | Value |
 |-------|-------|
-| Agent | claude-code-web |
-| Since | 2026-01-31T09:30 |
-| Task | [[tasks/completed/task-cc-001-hooks-setup.claude-code]] |
-| Status | Completed |
+| Agent | None (available) |
+| Since | - |
+| Task | - |
+| Status | Idle |
 
-## Active Work
+## Last Session
 
-CC hooks setup completed. Session still active for exploration.
+claude-code-web completed CC hooks setup, Obsidian conversion, and Linux runner creation.
 
 ## Lock Protocol
 
@@ -35,6 +35,7 @@ CC hooks setup completed. Session still active for exploration.
 | Time | Agent | Action |
 |------|-------|--------|
 | 2026-01-31T09:30 | claude-code-web | Started hooks setup |
+| 2026-01-31T10:15 | claude-code-web | Completed all tasks, cleared status |
 
 ---
 

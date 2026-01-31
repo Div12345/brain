@@ -11,7 +11,7 @@ agent: overnight
 
 ## Duration
 Start: ~02:00
-End: ongoing (compacted at 08:33, resumed)
+End: ongoing (compacted at 08:33, resumed by overnight; 09:20 resumed by claude-code-web)
 
 ## Completed
 
@@ -38,7 +38,18 @@ End: ongoing (compacted at 08:33, resumed)
 - [x] [[inspirations/claude-code-ecosystem]] - frontmatter + backlinks
 - [x] [[context/priorities]] - frontmatter + backlinks
 - [x] [[tasks/pending/task-cc-001-hooks-setup]] - frontmatter + backlinks
-- [ ] Remaining files need conversion
+- [x] All remaining files converted (by claude-code-web)
+
+### Claude Code Web Agent Session (09:20-10:10)
+- [x] Created `.claude/settings.json` with hooks (SessionStart, UserPromptSubmit, Stop)
+- [x] Created `.claude/hooks/session-log.sh`
+- [x] Created `context/active-agent.md`
+- [x] Created `knowledge/claude-code-web-agent-setup.md`
+- [x] Created Linux overnight runner `tools/configs/overnight-brain.sh`
+- [x] Created systemd service/timer for Linux scheduling
+- [x] Completed Obsidian frontmatter conversion for ALL .md files
+- [x] Moved task-cc-001 to completed
+- [x] Updated DESIGN.md, capabilities.md, session-state.md
 
 ## Files Created/Modified
 - `inspirations/claude-code-ecosystem.md`
@@ -64,10 +75,12 @@ End: ongoing (compacted at 08:33, resumed)
 - Q-2026-01-31-05: Brain repo local path
 
 ## Next Session Should
-1. Complete Obsidian conversion of remaining files
+1. ~~Complete Obsidian conversion of remaining files~~ ✅ Done
 2. Test graph view in Obsidian
-3. Answer pending questions
-4. Have CC pick up hooks task
+3. Answer pending questions (user input needed)
+4. ~~Have CC pick up hooks task~~ ✅ Done
+5. Test overnight runner on actual Linux/Windows system
+6. Generate first predictions based on patterns
 
 ## Notes
 - Session compacted mid-run due to context limits
