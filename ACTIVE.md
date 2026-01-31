@@ -1,35 +1,55 @@
+---
+created: 2026-01-31
+tags:
+  - coordination
+  - active-work
+  - status
+status: active
+updated: 2026-01-31T09:43
+aliases:
+  - active work
+  - current tasks
+---
+
 # Active Work Coordination
 
-> Agents check this file to avoid duplicating work. Update when you start/finish tasks.
+> Agents check this file to avoid duplicating work.
 
 ## Currently Running
 
 | Agent | Task | Started | Status |
 |-------|------|---------|--------|
-| Claude Code | Vault analysis (overnight.md) | 2026-01-31 ~02:30 | 🔄 Starting |
-| Claude Desktop | Orchestration research/design | 2026-01-31 ~02:30 | 🔄 Starting |
+| overnight-A (Desktop) | Research + infrastructure | 2026-01-31T09:30 | 🔄 Active |
+
+## Recent Commits This Session
+
+1. Research: Recursive self-improvement patterns
+2. Self-improvement: Add metrics and retrospective tracking
+3. Research: Proactive assistant patterns
+4. Proactive: Generate predictions for tomorrow
 
 ## Task Ownership
 
 | Area | Owner | Notes |
 |------|-------|-------|
-| knowledge/ | Claude Code | Vault analysis findings |
-| context/predictions.md | Claude Code | Pattern-based predictions |
-| context/patterns.md | Claude Code | Behavioral patterns |
-| inspirations/ | Desktop | Research findings |
-| tools/orchestration/ | Desktop | Design docs |
-| tools/configs/ | Desktop | Config prototypes |
-| prompts/pending.md | Both | Questions for user |
+| knowledge/research/ | overnight-A | Research docs |
+| context/ | overnight-A | Infrastructure |
+| prompts/ | Both | Questions |
 | logs/ | Both | Activity logs |
 
 ## Coordination Rules
 
-1. Check this file before starting major work
-2. Update status when starting/finishing
-3. If you see the other agent working on something, don't duplicate
-4. Use logs/ to see what's been done
-5. Commit frequently so the other agent can see progress
+1. Check [[context/active-agents]] before starting
+2. Log to [[logs/]]
+3. Check [[context/off-limits]] before modifications
+4. Commit frequently
+5. Generate questions → [[prompts/pending]]
+
+## See Also
+- [[context/active-agents]] - Detailed agent tracking
+- [[context/session-state]] - Recovery state
+- [[context/handoff]] - Handoff protocol
 
 ---
 
-*Last updated: Pre-flight*
+*Last updated: 2026-01-31T09:43 by overnight-A*
