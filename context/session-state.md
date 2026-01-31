@@ -4,76 +4,51 @@ tags:
   - context
   - session
   - compaction-resilient
-updated: 2026-01-31T09:55
-agent: claude-code-web
+updated: 2026-01-31T09:52
+agent: overnight
 ---
 
 # Session State
 
-> **COMPACTION RESILIENCE**: Read this file first after any context reset.
+> **COMPACTION RESILIENCE**: Read this first after context reset.
 
-## Current Session
-- **Started**: 2026-01-31 ~02:00
-- **Agent**: overnight (Desktop Claude)
-- **Mode**: Autonomous overnight run
+## Active Agent
+- **overnight-A** (Desktop Claude): Research + infrastructure ✓
 
-## Active Task
-**Obsidian conversion + system buildout**
+## Session Summary (Extended)
 
-Converting brain repo to proper Obsidian vault format with:
-- YAML frontmatter
-- `[[backlinks]]`
-- Tag taxonomy per [[meta/obsidian-conventions]]
+**Research Docs Created (9):**
+- [[knowledge/research/recursive-self-improvement]]
+- [[knowledge/research/proactive-assistant-patterns]]
+- [[knowledge/research/multi-agent-coordination]]
+- [[knowledge/research/task-automation-scheduling]]
+- [[knowledge/research/pkm-mcp-servers]]
+- [[knowledge/research/obsidian-mcp-options]]
+- [[knowledge/research/ai-memory-systems]]
+- [[knowledge/research/claude-code-ecosystem]]
+- [[knowledge/research/context-window-management]]
 
-## Completed This Session
-- [x] Research: CC ecosystem, memory systems, proactive patterns
-- [x] Infrastructure: agents/, skills/, tasks/, templates
-- [x] Obsidian config: `.obsidian/*.json`
-- [x] Converted: overnight.md, ai-memory-systems.md, claude-code-ecosystem.md, priorities.md, task-cc-001
-- [x] Created: HOME.md, obsidian-conventions.md, session log
+**Patterns Created (2):**
+- [[knowledge/patterns/multi-agent-coordination]]
+- [[knowledge/patterns/compaction-recovery]]
 
-## In Progress
-- [x] Convert remaining files to Obsidian format (completed by claude-code-web)
-- [x] CC hooks setup (completed by claude-code-web)
-- [ ] Evaluate connected MCPs
-- [ ] Research additional tools
+**Infrastructure:**
+- [[context/active-agents]]
+- [[context/self-improvement-metrics]]
+- [[context/predictions]]
 
-## Next If Compacted
-1. Read this file + [[context/priorities]] + [[logs/2026-01-31-overnight]]
-2. Check recent GitHub commits for latest state
-3. Continue from "In Progress" list
-4. Commit after each task
+**Files Updated:**
+- HOME.md, ACTIVE.md, CLAUDE.md
+- logs/2026-01-31-overnight.md
 
-## Files Converted by claude-code-web Session
-All previously listed files now have frontmatter:
-- `context/` files - Done
-- `knowledge/` READMEs - Done
-- `experiments/README.md` - Done
-- `tools/` contents - Done
-- `meta/structure.md` - Done
-- `inspirations/` files - Done
+## Pending (Blocked on User)
+- Q-01: Overnight schedule preference
+- Q-02: Obsidian vault path
+- Q-03: Failed task notification
+- Q-04: Off-limits tasks
+- Q-05: Brain repo local path
 
-## Additional Work by claude-code-web
-- Created `.claude/settings.json` with hooks
-- Created `.claude/hooks/session-log.sh`
-- Created `tools/configs/overnight-brain.sh` (Linux runner)
-- Created `tools/configs/brain-overnight.service` (systemd)
-- Created `tools/configs/brain-overnight.timer` (systemd timer)
-- Created `tasks/failed/` directory
-- Documented in `knowledge/claude-code-web-agent-setup.md`
-
-## Open Questions for User
-1. Overnight schedule preference (when to run?)
-2. Obsidian vault path (for sync)
-3. Failed task notification approach
-4. Off-limits tasks/domains
-5. Brain repo local path
-
-## Recovery Commands
-```
-# Check what was done
-gh api repos/Div12345/brain/commits --jq '.[0:5] | .[] | .commit.message'
-
-# Read current priorities
-gh api repos/Div12345/brain/contents/context/priorities.md -H "Accept: application/vnd.github.raw"
-```
+## Recovery Protocol
+1. `gh api repos/Div12345/brain/commits --jq '.[0:5]'`
+2. Read this file + [[context/predictions]]
+3. Continue from pending list
