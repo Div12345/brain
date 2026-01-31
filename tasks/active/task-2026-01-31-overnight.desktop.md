@@ -6,54 +6,60 @@ requires:
   - web_search
   - github_access
   - file_creation
-preferred_interface: any
+preferred_interface: claude-desktop
 timeout: 240m
 status: active
-claimed_by: desktop-architect
+claimed_by: desktop-opus
 ---
 
-# Task: Overnight Research & Build Session
+# Task: Deep Orchestration Research & Build Night
 
-## Objective
-Continue building out the brain orchestration system with deep research and practical implementations.
+## Mission
+Continue building the brain system overnight. Research, prototype, document. Make tangible progress that CC can build on tomorrow.
 
-## Core Intentionalities (from user)
-- Self-evolving AI assistant system
-- Learns patterns, anticipates needs
-- Builds its own tools when gaps identified
+## Core Intentions (from user)
+- Self-evolving system that learns patterns
+- Builds its own tools when gaps exist
 - Scientific experimentation with logging
-- Proactively prompts for information
-- Never harms existing systems
+- Proactive - anticipate, don't wait
+- No harm to existing systems
 
 ## Work Streams
 
-### 1. Deep Tool Research
-- [ ] Evaluate claude-flow installation and setup requirements
-- [ ] Research hookify/hooks for Claude Code
-- [ ] Find MCP servers useful for this system
-- [ ] Research Obsidian automation tools
-- [ ] Find prompt engineering resources for agent definitions
+### Stream 1: Deep Tool Research
+- [ ] Get claude-flow installation details & gotchas
+- [ ] Research hookify / CC hooks system
+- [ ] Find CC plugin architecture docs
+- [ ] Research AIM memory MCP capabilities
+- [ ] Look at how tosage tracks usage
 
-### 2. Build Practical Tools
+### Stream 2: Build Out Infrastructure
 - [ ] Create overnight agent definition
-- [ ] Write CC startup hook draft
-- [ ] Create sample task templates
-- [ ] Build context file templates
+- [ ] Draft CC startup hook
+- [ ] Prototype usage tracking schema
+- [ ] Build first real task for CC
 
-### 3. Pattern Discovery
-- [ ] Search Reddit for Claude workflows
-- [ ] Find blog posts on autonomous coding
-- [ ] Document useful patterns in knowledge/
+### Stream 3: Knowledge Synthesis
+- [ ] Document learnings in knowledge/insights/
+- [ ] Update inspirations/ with new discoveries
+- [ ] Identify gaps → add to tools to build
 
-### 4. System Structure
-- [ ] Flesh out agents/ directory
-- [ ] Create experiment templates
-- [ ] Set up knowledge/patterns/ structure
+### Stream 4: Vault Integration Prep
+- [ ] Research Obsidian folder analysis approaches
+- [ ] Draft vault analysis prompt for CC
+- [ ] Plan knowledge extraction pipeline
 
-## Success Criteria
-- More actionable configs/templates
-- Documented findings in inspirations/
-- System more ready for first real overnight run
+## Output Locations
+- Research → `inspirations/`
+- Designs → `tools/`
+- Insights → `knowledge/insights/`
+- Questions → `prompts/pending.md`
+- Logs → `logs/`
 
-## Notes
-User said "keep going for the night" - autonomous research session authorized.
+## Continue Until
+- Rate limited, OR
+- Major blocker requiring user input, OR
+- All streams exhausted
+
+## On Pause
+Write status to `context/overnight-status.md` so work can resume.
