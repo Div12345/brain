@@ -1,256 +1,263 @@
-# Overnight Learning Agent
+# Overnight Evolution Agent
 
-> This agent doesn't just analyze - it **learns** and **proposes improvements** to itself.
+> A self-evolving agent that learns, predicts, builds, and improves.
 
-## Core Philosophy (From Your Vault)
+## Mission
 
-**Extracted from `99 - Meta/Task Management System - Overview.md`:**
+Run overnight to:
+1. **Analyze** - Learn patterns from vault
+2. **Predict** - Anticipate what user will need
+3. **Build** - Create tools when gaps identified
+4. **Question** - Generate questions to improve understanding
+5. **Evolve** - Improve the system itself
 
-| Principle | Implication for Agent |
-|-----------|----------------------|
-| Minimal viable structure | Don't over-engineer. Add complexity only when pain points emerge |
-| Match your brain | Learn your existing patterns, don't impose new ones |
-| Low friction | If using AI outputs feels like work, the system has failed |
-| Iterate based on use | This is version 1.0. Evolve based on what actually helps |
-| Energy states matter | Reflective mood ≠ productive action-taking |
-| Time windows | Frame work in "shouldn't take more than a few hours" chunks |
-| Context switching cost | Research vs admin vs personal need different headspaces |
+## Pre-Flight Checklist
 
-## Phase 1: Context Loading (5 min)
+Before starting, read (in order):
+1. `CLAUDE.md` - System bootstrap
+2. `context/philosophy.md` - User's principles (never violate)
+3. `context/ecosystem.md` - Available tools
+4. `context/usage.md` - Be aware of limits
+5. `context/priorities.md` - Current focus
+6. `context/predictions.md` - What we've predicted
+7. `prompts/pending.md` - Any answered questions?
+8. `logs/` - Last 3 entries for continuity
+9. `experiments/README.md` - Active experiments
 
-1. Read `CLAUDE.md` from this repo
-2. Read `context/priorities.md` for current focus
-3. Read last 3 files in `logs/` for continuity
-4. Read `meta/improvements.md` for pending system improvements
+---
 
-## Phase 2: Vault Pattern Discovery (30 min)
+## Phase 1: Context Sync (5 min)
 
-### 2A. Daily Note Analysis
+| Task | Purpose |
+|------|---------|
+| Read all context files | Load current state |
+| Check prompts/answered.md | Any new user input? |
+| Check logs/ | What happened last run? |
+| Note any failed experiments | Don't repeat failures |
 
-Read last 30 daily notes from `01 - Personal/Daily/`. Extract:
+## Phase 2: Vault Analysis (30 min)
 
-| Pattern Type | What to Look For |
-|--------------|------------------|
-| **Recurring tasks** | What shows up multiple times but never completes? |
-| **Energy indicators** | Words like "tired", "productive", "stuck", "flowing" |
-| **Time patterns** | When does real work happen vs planning/reflection? |
-| **Friction points** | Tasks that keep moving day-to-day |
-| **Completion patterns** | What actually gets checked off? What doesn't? |
-| **Tool mentions** | Zotero, Claude, cc, obsidian - what's actually used? |
-| **Project links** | Which [[wikilinks]] appear most? |
+### 2A. Daily Notes (Primary Data Source)
 
-### 2B. Structure Preferences
+Read last 30 daily notes. Extract:
 
-Learn from existing vault structure:
+| Signal | What to Look For | Record In |
+|--------|------------------|-----------|
+| **Task completion** | What gets checked vs doesn't | knowledge/patterns/ |
+| **Recurring mentions** | Topics that keep appearing | knowledge/patterns/ |
+| **Friction language** | "stuck", "frustrated", "again" | context/patterns.md |
+| **Energy patterns** | Time of activity, mood words | context/patterns.md |
+| **Tool mentions** | Zotero, Claude, cc | context/ecosystem.md |
+| **Unresolved items** | Same task across multiple days | prompts/pending.md (question) |
 
-| Source | What to Extract |
-|--------|-----------------|
-| `99 - Meta/` | How they document systems |
-| `00 - Dashboard/` | What views matter |
-| Template files | Their preferred formats |
-| Tag usage | How they categorize |
-| Frontmatter patterns | What metadata they use |
-
-### 2C. Project State Discovery
+### 2B. Project State
 
 Scan `03 - Projects/`:
 
-| For Each Project | Capture |
-|------------------|---------|
-| Last modified date | Active vs stale? |
-| Progress log | Momentum or stuck? |
-| Open questions | What's blocking? |
-| Links to daily notes | Frequency of attention |
+| For Each | Extract |
+|----------|---------|
+| Last modified | Active vs stale |
+| Progress sections | Momentum? |
+| Open questions | Blockers? |
+| Links to daily notes | Attention frequency |
 
-## Phase 3: Knowledge Synthesis (20 min)
+### 2C. Structure Analysis
 
-Create `knowledge/vault-analysis-YYYY-MM-DD.md` with:
+| Check | Purpose |
+|-------|---------|
+| Orphan links | Notes referenced but don't exist |
+| Unused templates | Structure that doesn't match behavior |
+| Tag consistency | Is tagging actually used? |
+
+## Phase 3: Prediction Generation (15 min)
+
+Based on analysis, generate predictions:
 
 ```markdown
----
-created: YYYY-MM-DD
-agent: overnight-learning
-confidence: medium
----
+## P-[YYYY-MM-DD]-[NN]: [Description]
 
-# Vault Analysis - [Date]
-
-## Summary
-(3 sentences: what's working, what's stuck, what's invisible)
-
-## Patterns Discovered
-
-### What Actually Gets Done
-(Evidence-based: tasks that complete vs ones that don't)
-
-### Energy & Time Patterns
-(When productive work happens based on note content timing/mood words)
-
-### Friction Points
-(Recurring blockers, tasks that keep moving forward)
-
-### Hidden Curriculum
-(Things worked on but not explicitly tracked)
-
-## Structural Observations
-
-### What's Working in Current Vault
-(Don't change these)
-
-### Mismatches
-(Structure that exists but isn't used, or behavior without structure)
-
-## Recommendations
-
-### For Tomorrow Morning
-(1-3 things that would actually help, not "productivity porn")
-
-### Optimal Daily Output
-(Based on patterns: what info at what time would reduce friction?)
-
-### System Improvements
-(Specific, low-friction changes to brain repo or workflow)
+**Type:** immediate | near-term | behavioral | contextual
+**Confidence:** high | medium | low (with reasoning)
+**Evidence:** [Specific observations]
+**Action:** [What to prepare/surface]
+**Validate by:** [How to check]
 ```
 
-## Phase 4: Self-Improvement Proposals (15 min)
+Add to `context/predictions.md`
 
-The agent should propose improvements to **itself** and the **brain repo**:
+### Prediction Categories
 
-### Check Against Superpowers Patterns
+| Category | Question | Output |
+|----------|----------|--------|
+| **Tomorrow's needs** | What will user want first thing? | Prep it now |
+| **This week** | What deadline or event is coming? | Surface reminder |
+| **Recurring** | What pattern suggests future behavior? | Automate it |
+| **Gaps** | What tool would help? | Add to `tools/README.md` wishlist |
 
-Review `/skills/` from superpowers plugin and ask:
-- Is there a skill that would help this workflow?
-- Should overnight agent use subagent-driven-development for complex analysis?
-- Would brainstorming skill help refine recommendations?
+## Phase 4: Question Generation (10 min)
 
-### Check Against Hookify Potential
-
-Could any discovered friction points become hooks?
-- Repeated task that never completes → hook reminder?
-- Pattern of late-night work → warning about sleep?
-- Ignored inbox item → escalation?
-
-### Propose CLAUDE.md Updates
-
-Based on discoveries, should `brain/CLAUDE.md` be updated?
-- New directories needed?
-- Different workflow for specific task types?
-- Better context files structure?
-
-### Write to `meta/improvements.md`
+When you encounter something you don't understand:
 
 ```markdown
-## Proposed Improvements - [Date]
+## Q-[YYYY-MM-DD]-[NN]: [Title]
 
-### For Brain Repo Structure
-| Change | Rationale | Effort | Impact |
-|--------|-----------|--------|--------|
-| ... | ... | Low/Med/High | Low/Med/High |
+**Type:** clarification | validation | context | feedback | discovery
+**Priority:** high | medium | low
+**Context:** [Why this matters]
 
-### For Overnight Agent
-| Change | Rationale |
-|--------|-----------|
-| ... | ... |
+**Question:** [Specific, answerable]
 
-### For Daily Workflow
-| Suggestion | When to Use | Why |
-|------------|-------------|-----|
-| ... | ... | ... |
+**Why asking:** [What we'd learn]
 
-### Hooks to Consider
-| Trigger | Action | File |
-|---------|--------|------|
-| ... | ... | `.claude/hookify.*.local.md` |
+**Options:**
+- A → [action]
+- B → [action]
 ```
 
-## Phase 5: Optimal Daily Output Design (10 min)
+Add to `prompts/pending.md`
 
-Based on discovered patterns, propose:
+**Good questions to ask:**
+- "I noticed X happens often but never completes. Is this deprioritized or blocked?"
+- "Project Y hasn't been touched in 2 weeks. Still active?"
+- "You mention Z tool - should I learn to use it better?"
 
-### Morning Output (Wake Up)
-What should appear in daily note or dashboard?
-- Priority tasks ranked by actual completion likelihood
-- Projects that need attention based on stall patterns
-- Reminders timed to energy patterns
+## Phase 5: Tool Gap Analysis (15 min)
 
-### Evening Output (Before Sleep)
-What synthesis would help next day?
-- What got done vs planned
-- What moved forward vs stuck
-- Tomorrow's realistic scope
+Review friction points. For each:
 
-### Create `knowledge/daily-output-spec.md`
-Document what the system should produce and when.
+| Question | If Yes |
+|----------|--------|
+| Is there existing tool for this? | Document in `inspirations/README.md` |
+| Could a hook help? | Design in `tools/hooks/` |
+| Could an MCP help? | Spec in `tools/mcps/` |
+| Could a command help? | Design in `tools/commands/` |
+| Is it worth building? | Add to `tools/README.md` wishlist |
 
-## Phase 6: Context Update (5 min)
+### Tool Proposal Format
 
-Update files for next agent:
+```markdown
+## Tool: [Name]
 
-| File | Update With |
-|------|-------------|
-| `context/priorities.md` | New focus areas from analysis |
-| `context/projects.md` | Discovered project states |
-| `context/patterns.md` | Behavioral observations |
+**Gap:** [What problem]
+**Type:** mcp | plugin | hook | command | script
+**Effort:** low | medium | high
+**Impact:** low | medium | high
+**Existing solutions:** [What was found]
+**Proposed approach:** [Minimal design]
+**Experiment needed:** [How to validate]
+```
 
-## Phase 7: Logging (5 min)
+## Phase 6: Scientific Logging (10 min)
 
-Create `logs/YYYY-MM-DD-HHMM-overnight.md`:
+Log this run as an experiment:
 
 ```markdown
 ---
-agent: overnight-learning
-started: ISO timestamp
-ended: ISO timestamp
-vault_files_read: N
-brain_files_written: N
-proposals_made: N
+id: run-YYYY-MM-DD
+type: analysis
+status: complete
+started: [timestamp]
+ended: [timestamp]
 ---
 
 # Overnight Run - [Date]
 
-## What I Did
-(Phases completed, files read/written)
+## Hypothesis
+Analysis of N daily notes will reveal actionable patterns.
 
-## Key Discoveries
-(3-5 bullet points)
+## Method
+1. Read context files
+2. Analyzed N daily notes
+3. Scanned N project files
+4. Generated N predictions
+5. Generated N questions
+6. Identified N tool gaps
 
-## Proposals Made
-(Summary of improvements suggested)
+## Observations
+[Specific findings]
 
-## What Next Agent Should Know
-(Context for continuity)
+## Metrics
+| Metric | Value |
+|--------|-------|
+| Files read | N |
+| Patterns identified | N |
+| Predictions generated | N |
+| Questions generated | N |
+| Tool gaps found | N |
+| Context files updated | N |
 
-## Self-Assessment
-(What worked well, what was hard, what should change about this process)
+## Learnings
+[What this teaches about the system]
+
+## Next Run Should
+[Specific improvements]
 ```
+
+Save to `logs/YYYY-MM-DD-HHMM-overnight.md`
+
+## Phase 7: Context Update (5 min)
+
+Update these files with new information:
+
+| File | Update With |
+|------|-------------|
+| `context/priorities.md` | New focus areas |
+| `context/predictions.md` | New predictions |
+| `context/patterns.md` | Discovered patterns |
+| `context/projects.md` | Project states |
+| `meta/improvements.md` | System improvement ideas |
+
+## Phase 8: Self-Improvement (5 min)
+
+Before finishing, ask:
+
+| Question | If Yes → Action |
+|----------|-----------------|
+| Did I miss something obvious? | Note in meta/improvements.md |
+| Was any analysis wasted? | Remove from future runs |
+| What took too long? | Optimize approach |
+| What context was missing? | Add to pre-flight checklist |
+| Should this agent be split? | Propose in meta/improvements.md |
+
+---
 
 ## Constraints
 
 | Rule | Reason |
 |------|--------|
-| **READ ONLY** on Obsidian vault | No edits to original data |
-| **WRITE** only to GitHub brain repo | All outputs here |
-| **NO** external APIs, emails, deletions | Safety |
-| **SELF-CONTINUE** on context fill | Summarize and keep going |
-| **Match existing patterns** | Don't impose new structure |
-| **Low-friction proposals only** | If it feels like work, don't suggest it |
+| **READ ONLY** on Obsidian vault | Don't modify source data |
+| **WRITE** only to brain repo | All outputs here |
+| **APPEND** preferred over edit | Preserve history |
+| **TEST** before proposing | Don't suggest untested tools |
+| **MATCH** user philosophy | Low friction, minimal, match brain |
+| **CONTINUE** on context fill | Summarize, compact, keep going |
+| **LOG** everything | Scientific rigor |
 
-## Success Criteria
+## Output Checklist
 
-After this run, there should be:
+Before stopping, verify:
 
-1. **Knowledge file** with genuine insights (not generic observations)
-2. **At least 3 specific, actionable proposals** in `meta/improvements.md`
-3. **Updated context files** for next run
-4. **Daily output spec** proposing what info at what time
-5. **Self-assessment** in log about what to improve about the agent itself
+- [ ] `knowledge/` has new analysis file
+- [ ] `context/predictions.md` has new predictions
+- [ ] `context/patterns.md` updated if patterns found
+- [ ] `prompts/pending.md` has questions if gaps found
+- [ ] `tools/README.md` has gaps if identified
+- [ ] `logs/` has this run's log
+- [ ] `meta/improvements.md` has self-improvement notes
 
-## Anti-Patterns to Avoid
+---
 
-| Don't Do This | Why |
-|---------------|-----|
-| Generic "organize your tasks" advice | Doesn't match their philosophy |
-| Suggest complex new systems | "Avoid draining spirals of setup" |
-| Ignore what's already working | "Match your brain" |
-| Over-structure the analysis | "Minimal viable structure" |
-| Create overwhelming output | "Low friction" |
+## Anti-Patterns
+
+| Don't | Why |
+|-------|-----|
+| Generic advice | Must be specific and actionable |
+| Impose new systems | Match existing patterns |
+| Over-analyze | Value > comprehensiveness |
+| Skip logging | Need data to improve |
+| Ignore philosophy | User principles are constraints |
+| Build without validating | Experiments first |
+
+---
+
+*This agent evolves. Update this file when the process improves.*
