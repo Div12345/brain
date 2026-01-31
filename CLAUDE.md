@@ -44,6 +44,7 @@ git add -A && git commit -m "[type]: description"
 3. Check [[context/off-limits]] before modifications
 4. Commit frequently for coordination
 5. Generate questions → [[prompts/pending]]
+6. Follow [[meta/contribution-workflow]] for PRs
 
 ## Task Claiming
 1. Check [[tasks/pending/]]
@@ -58,7 +59,25 @@ git add -A && git commit -m "[type]: description"
 - **Handoffs:** [[context/handoff]] - Agent transitions
 - **Questions:** [[prompts/pending]] / [[prompts/answered]]
 
+## Git Workflow
+
+```bash
+# Start: create branch from main
+git checkout -b claude/<task>-<session-suffix> origin/main
+
+# Work: commit and push frequently
+git add -A && git commit -m "[type]: description"
+git push -u origin claude/<branch>
+
+# Coordinate: send messages to other agents
+echo "..." > messages/outbox/MSG-<timestamp>-<from>-<to>.md
+
+# Finish: create PR or request merge
+# See [[meta/contribution-workflow]] for details
+```
+
 ## See Also
-- [[.claude/skills/brain-system/SKILL.md]] - Full skill reference
+- [[meta/contribution-workflow]] - Full PR/contribution guide
+- [[messages/README]] - Inter-agent messaging
 - [[agents/overnight]] - Overnight agent definition
 - [[HOME]] - Obsidian home page
