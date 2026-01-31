@@ -1,8 +1,20 @@
+---
+created: 2026-01-31
+tags:
+  - research
+  - memory
+  - architecture
+  - autonomous
+status: active
+agent: overnight
+aliases:
+  - memory architecture
+  - L0-L1-L2
+  - LPM
+---
+
 # AI Agent Memory Systems
 
-> Research compiled 2026-01-31
-
-## Summary
 Memory is the foundation for autonomous AI systems that can evolve and personalize over time. Three-layer architecture emerging as standard.
 
 ## Memory Architecture (L0-L1-L2)
@@ -11,16 +23,19 @@ Memory is the foundation for autonomous AI systems that can evolve and personali
 - Direct capture from interactions
 - Logs, transcripts, observations
 - Unprocessed, high-volume
+- **Brain equivalent:** [[logs/]]
 
 ### L1: Abstracted Knowledge
 - Patterns extracted from L0
 - Structured facts, preferences
 - Retrieved via semantic search
+- **Brain equivalent:** [[knowledge/]]
 
 ### L2: Model-Level Integration
 - "Lifelong Personal Model" (LPM)
 - Knowledge encoded in parameters
 - Enables reasoning, not just retrieval
+- **Brain equivalent:** Not yet implemented
 
 ## Memory Types
 
@@ -56,11 +71,11 @@ Agent evaluates own memory quality:
 ### Current Implementation (L0-L1)
 - `knowledge/` = L1 abstractions
 - `logs/` = L0 raw data
-- `context/` = working memory
+- [[context/]] = working memory
 - Vector search not yet implemented
 
 ### Future Additions
-- Self-assessment metrics
+- Self-assessment metrics → see [[experiments/]]
 - Auto-curation rules
 - Relevance scoring
 - Pattern decay/refresh
@@ -73,15 +88,11 @@ Agent evaluates own memory quality:
 
 ## Sources
 - IBM: AI Agent Memory concepts
-- arXiv: LTM and self-evolution
+- arXiv: LTM and self-evolution (2410.15665)
 - FourWeekMBA: Automated memory management
 - Personal.ai: Memory stacks architecture
 
-## Tags
-- #memory
-- #architecture
-- #autonomous
-- #patterns
-
----
-*Generated: 2026-01-31 by overnight-research*
+## Related
+- [[agents/overnight]] - Uses these patterns
+- [[inspirations/claude-code-ecosystem]] - Tools context
+- [[tools/orchestration/DESIGN]] - System design
