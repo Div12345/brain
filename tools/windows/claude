@@ -48,22 +48,23 @@ fi
 COMMAND="$1"
 shift
 
-# Commands that require DevTools
+# Try DevTools first for most commands, fall back to pyautogui
 case "$COMMAND" in
     info|messages)
+        # DevTools only
         "$WINDOWS_PYTHON" "$DEVTOOLS_SCRIPT" "$COMMAND" "$@"
         ;;
-    *)
-        # Try DevTools first for 'last', fall back to pyautogui
-        if [ "$COMMAND" = "last" ]; then
-            result=$("$WINDOWS_PYTHON" "$DEVTOOLS_SCRIPT" "$COMMAND" "$@" 2>/dev/null)
-            if [ -n "$result" ] && [ "$result" != "None" ]; then
-                echo "$result"
-            else
-                "$WINDOWS_PYTHON" "$PYAUTOGUI_SCRIPT" "$COMMAND" "$@"
-            fi
+    send|last)
+        # Prefer DevTools, fall back to pyautogui
+        result=$("$WINDOWS_PYTHON" "$DEVTOOLS_SCRIPT" "$COMMAND" "$@" 2>/dev/null)
+        if [ -n "$result" ] && [ "$result" != "None" ] && [ "$result" != "null" ]; then
+            echo "$result"
         else
             "$WINDOWS_PYTHON" "$PYAUTOGUI_SCRIPT" "$COMMAND" "$@"
         fi
+        ;;
+    *)
+        # pyautogui for status, read, watch
+        "$WINDOWS_PYTHON" "$PYAUTOGUI_SCRIPT" "$COMMAND" "$@"
         ;;
 esac

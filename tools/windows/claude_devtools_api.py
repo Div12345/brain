@@ -19,6 +19,11 @@ import hashlib
 import requests
 import websocket
 
+# Fix Windows console encoding
+if sys.platform == 'win32':
+    sys.stdout.reconfigure(encoding='utf-8', errors='replace')
+    sys.stderr.reconfigure(encoding='utf-8', errors='replace')
+
 DEVTOOLS_URL = "http://127.0.0.1:9222"
 
 def get_claude_page():
@@ -155,52 +160,43 @@ def get_last_message(ws):
 
 
 def send_message_via_dom(ws, message):
-    """Send a message by typing into the input field."""
-    # Focus and fill the input
+    """Send a message via DevTools using execCommand (works with React)."""
+    # Use execCommand insertText which properly triggers React's input handling
     js_code = f"""
     (function() {{
-        // Find textarea or contenteditable input
-        const input = document.querySelector('textarea, [contenteditable="true"]');
-        if (!input) return 'Input not found';
+        const ta = document.querySelector('textarea');
+        if (!ta) return 'no-textarea';
 
-        input.focus();
+        ta.focus();
+        document.execCommand('selectAll', false, null);
+        document.execCommand('insertText', false, {json.dumps(message)});
 
-        // Set value
-        if (input.tagName === 'TEXTAREA') {{
-            input.value = {json.dumps(message)};
-            input.dispatchEvent(new Event('input', {{ bubbles: true }}));
-        }} else {{
-            input.textContent = {json.dumps(message)};
-            input.dispatchEvent(new InputEvent('input', {{ bubbles: true }}));
-        }}
-
-        return 'Message set';
+        return 'text-set';
     }})()
     """
     result = evaluate_js(ws, js_code, 5)
 
-    if result == 'Message set':
-        # Press Enter to send
-        time.sleep(0.2)
-        js_enter = """
-        (function() {
-            const input = document.querySelector('textarea, [contenteditable="true"]');
-            if (input) {
-                // Try clicking send button first
-                const sendBtn = document.querySelector('button[type="submit"], [data-testid*="send"]');
-                if (sendBtn) {
-                    sendBtn.click();
-                    return 'Clicked send';
-                }
-                // Fallback: dispatch Enter key
-                input.dispatchEvent(new KeyboardEvent('keydown', {key: 'Enter', code: 'Enter', keyCode: 13, bubbles: true}));
-                return 'Sent via Enter';
+    if result != 'text-set':
+        return f"Input failed: {result}"
+
+    time.sleep(0.2)
+
+    # Click send button
+    js_send = """
+    (function() {
+        const buttons = document.querySelectorAll('button');
+        for (const btn of buttons) {
+            const ariaLabel = (btn.getAttribute('aria-label') || '').toLowerCase();
+            if (ariaLabel.includes('send')) {
+                btn.click();
+                return 'sent';
             }
-            return 'Failed';
-        })()
-        """
-        return evaluate_js(ws, js_enter, 6)
-    return result
+        }
+        return 'no send button';
+    })()
+    """
+    result = evaluate_js(ws, js_send, 6)
+    return "Message sent" if result == 'sent' else result
 
 
 def watch_messages(ws, interval=3):
@@ -246,8 +242,10 @@ def main():
 
         elif command == "messages":
             messages = get_messages(ws)
-            for msg in messages:
-                print(f"[{msg.get('tag', '?')}] {msg.get('text', '')[:100]}")
+            for msg in messages[-10:]:  # Last 10 messages
+                role = msg.get('role', '?')
+                text = msg.get('text', '')[:100].replace('\n', ' ')
+                print(f"[{role}] {text}")
 
         elif command == "last":
             last = get_last_message(ws)
