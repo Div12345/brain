@@ -1,0 +1,35 @@
+#!/bin/bash
+# Claude Desktop CLI - Control Claude Desktop from WSL
+# Usage: claude <command> [args]
+#
+# Commands:
+#   status          Check if Claude Desktop is running
+#   send <message>  Send a message to Claude Desktop
+#   read            Read the current conversation
+#   last            Get the last assistant response
+#   wait [timeout]  Wait for Claude to finish responding
+#
+# Examples:
+#   claude status
+#   claude send "Hello, how are you?"
+#   claude last
+#   claude send "What is 2+2?" && sleep 5 && claude last
+
+WINDOWS_PYTHON="/mnt/c/ProgramData/Anaconda3/python.exe"
+SCRIPT_PATH="C:\\Users\\din18\\claude_desktop_api.py"
+
+if [ -z "$1" ]; then
+    echo "Claude Desktop CLI"
+    echo ""
+    echo "Usage: claude <command> [args]"
+    echo ""
+    echo "Commands:"
+    echo "  status          Check if Claude Desktop is running"
+    echo "  send <message>  Send a message"
+    echo "  read            Read full conversation"
+    echo "  last            Get last response"
+    echo "  wait [timeout]  Wait for response (default 120s)"
+    exit 1
+fi
+
+"$WINDOWS_PYTHON" "$SCRIPT_PATH" "$@"
