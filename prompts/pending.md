@@ -52,62 +52,7 @@ The system should proactively:
 
 ## Active Questions
 
-### Q-2026-01-31-01: Daily template simplification
-
-**Type:** validation
-**Priority:** medium
-**Context:** Your daily note template has 8+ sections but only 2 are regularly used.
-
-**Question:**
-The wellbeing metrics, habits, gratitude, and "Tomorrow's Intent" sections are unfilled in 100% of the 20 notes I analyzed. Should I:
-
-**Why I'm asking:**
-Understanding whether these are aspirational (keep them as reminders) or unused friction (remove them) affects how I interpret your workflow.
-
-**Possible answers:**
-- A: Keep them (aspirational, might use someday) → No changes
-- B: Remove them (they add guilt/friction) → Propose simplified template
-- C: Try a middle ground (collapse to one "reflection" section) → Propose minimal version
-- Other → User elaborates
-
----
-
-### Q-2026-01-31-02: arterial_analysis completion criteria
-
-**Type:** context
-**Priority:** high
-**Context:** This project has been your daily focus for 30+ days with phrases like "wrap up", "finish", "get conclusions".
-
-**Question:**
-What specific outputs would mark arterial_analysis as "done enough" for the current phase?
-
-**Why I'm asking:**
-Without clear completion criteria, it's hard to predict when you'll need to context-switch to other projects. Understanding the finish line helps me anticipate what support you'll need.
-
-**Possible answers:**
-- A: A specific deliverable (paper draft, meeting slides, data summary)
-- B: A methodology decision (finalizing CV approach, feature selection)
-- C: External event (advisor feedback, deadline)
-- Other → User elaborates
-
----
-
-### Q-2026-01-31-03: Claude dependency comfort level
-
-**Type:** clarification
-**Priority:** low
-**Context:** You wrote "I don't like my dependency on claude this much for coding" on 2026-01-14.
-
-**Question:**
-Is this something you want the system to help address (e.g., suggesting non-AI coding sessions), or is it a passing observation that doesn't require action?
-
-**Why I'm asking:**
-If it's a real concern, I could help by occasionally suggesting you tackle something without AI. If it's just venting, I won't add friction by bringing it up.
-
-**Possible answers:**
-- A: Yes, help me be less dependent → Occasionally suggest non-AI work
-- B: No, just venting → Don't address
-- C: It's complicated → User elaborates
+*No pending questions. See [[prompts/answered]] for recent answers.*
 
 ---
 

@@ -15,8 +15,7 @@ updated: 2026-01-31T09:35
 
 | Agent | Interface | Working On | Since | Status |
 |-------|-----------|------------|-------|--------|
-| overnight-A | Desktop Claude | Multi-agent coordination | 09:30 | Active |
-| overnight-B | Desktop Claude (remote) | Obsidian conversion, MCP research | 09:00 | Active |
+| code-main | Claude Code | Task triage, question resolution | 2026-02-01 | Active |
 
 ## Claimed Work Areas
 
