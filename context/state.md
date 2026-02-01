@@ -14,19 +14,23 @@ Key decisions now documented:
 
 ## Stuck Tasks
 - [ ] Credit card payment (!!!marked, recurring)
-- [ ] Taiwan/Hao Min lit review - catalog all publications from group
 - [ ] Check if mortality outcome = followup + death variables
 
 ## Tool Context
 - Primary: Claude Desktop/Code
 - Active: Pycaret, Zotero, Obsidian
-- MCP: paper-search, obsidian, zotero available
+- MCP: paper-search, obsidian, zotero, memory available
+- **NEW**: Windows Claude Desktop automation via `tools/windows/claude_send.sh`
+
+## Recent Completions
+- [x] Taiwan/Hao Min lit review - 20 papers catalogued (see [[Taiwan Group Papers Summary]])
+- [x] Windows automation - can send messages to Claude Desktop from WSL
 
 ## Next Actions
-1. Complete Taiwan papers lit review via Zotero
-2. Verify mortality/death outcome variable definitions
-3. Implement cluster stability selection in pipeline
-4. Test Fused LASSO on waveform features
+1. Verify mortality/death outcome variable definitions
+2. Implement cluster stability selection in pipeline
+3. Test Fused LASSO on waveform features
+4. Explore orchestration: Gemini CLI + Claude Desktop coordination
 
 ---
-*Updated: 2026-02-01 04:15*
+*Updated: 2026-02-01 05:30*
