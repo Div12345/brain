@@ -7,13 +7,15 @@
 #   send <message>  Send a message to Claude Desktop
 #   read            Read the current conversation
 #   last            Get the last assistant response
+#   latest          Get last exchange (user msg + response)
 #   wait [timeout]  Wait for Claude to finish responding
+#   watch [interval] Watch for new responses continuously
 #
 # Examples:
 #   claude status
 #   claude send "Hello, how are you?"
 #   claude last
-#   claude send "What is 2+2?" && sleep 5 && claude last
+#   claude watch 5   # Poll every 5 seconds
 
 WINDOWS_PYTHON="/mnt/c/ProgramData/Anaconda3/python.exe"
 SCRIPT_PATH="C:\\Users\\din18\\claude_desktop_api.py"
