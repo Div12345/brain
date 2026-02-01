@@ -4,21 +4,27 @@
 #
 # Commands:
 #   status          Check if Claude Desktop is running
+#   info            Get conversation info (ID, URL, title) - requires DevTools
 #   send <message>  Send a message to Claude Desktop
 #   read            Read the current conversation
+#   messages        Get structured messages with roles - requires DevTools
 #   last            Get the last assistant response
-#   latest          Get last exchange (user msg + response)
-#   wait [timeout]  Wait for Claude to finish responding
 #   watch [interval] Watch for new responses continuously
+#
+# DevTools mode (more precise):
+#   Launch Claude Desktop with: --remote-debugging-port=9222 --remote-allow-origins=*
+#   Then info/messages commands will use DevTools Protocol for precise access
 #
 # Examples:
 #   claude status
-#   claude send "Hello, how are you?"
+#   claude info          # Get conversation ID
+#   claude send "Hello"
 #   claude last
-#   claude watch 5   # Poll every 5 seconds
+#   claude messages      # Structured JSON with roles
 
 WINDOWS_PYTHON="/mnt/c/ProgramData/Anaconda3/python.exe"
-SCRIPT_PATH="C:\\Users\\din18\\claude_desktop_api.py"
+PYAUTOGUI_SCRIPT="C:\\Users\\din18\\claude_desktop_api.py"
+DEVTOOLS_SCRIPT="C:\\Users\\din18\\claude_devtools_api.py"
 
 if [ -z "$1" ]; then
     echo "Claude Desktop CLI"
@@ -26,12 +32,38 @@ if [ -z "$1" ]; then
     echo "Usage: claude <command> [args]"
     echo ""
     echo "Commands:"
-    echo "  status          Check if Claude Desktop is running"
+    echo "  status          Check if running"
+    echo "  info            Conversation info (DevTools)"
     echo "  send <message>  Send a message"
     echo "  read            Read full conversation"
+    echo "  messages        Structured messages (DevTools)"
     echo "  last            Get last response"
-    echo "  wait [timeout]  Wait for response (default 120s)"
+    echo "  watch [sec]     Watch for changes"
+    echo ""
+    echo "For DevTools mode, launch Claude with:"
+    echo "  --remote-debugging-port=9222 --remote-allow-origins=*"
     exit 1
 fi
 
-"$WINDOWS_PYTHON" "$SCRIPT_PATH" "$@"
+COMMAND="$1"
+shift
+
+# Commands that require DevTools
+case "$COMMAND" in
+    info|messages)
+        "$WINDOWS_PYTHON" "$DEVTOOLS_SCRIPT" "$COMMAND" "$@"
+        ;;
+    *)
+        # Try DevTools first for 'last', fall back to pyautogui
+        if [ "$COMMAND" = "last" ]; then
+            result=$("$WINDOWS_PYTHON" "$DEVTOOLS_SCRIPT" "$COMMAND" "$@" 2>/dev/null)
+            if [ -n "$result" ] && [ "$result" != "None" ]; then
+                echo "$result"
+            else
+                "$WINDOWS_PYTHON" "$PYAUTOGUI_SCRIPT" "$COMMAND" "$@"
+            fi
+        else
+            "$WINDOWS_PYTHON" "$PYAUTOGUI_SCRIPT" "$COMMAND" "$@"
+        fi
+        ;;
+esac
