@@ -102,18 +102,18 @@ def get_messages(ws):
 
         const messages = [];
 
-        // Each direct child is a message turn
+        // Each direct child is a message turn - filter out empty elements
         Array.from(container.children).forEach((child, i) => {
-            const hasUserMsg = child.querySelector('[data-testid="user-message"]');
-            const text = child.innerText.trim();
+            const text = (child.innerText || '').trim();
+            // Skip empty or tiny elements
+            if (text.length < 20) return;
 
-            if (text.length > 10) {
-                messages.push({
-                    index: i,
-                    role: hasUserMsg ? 'user' : 'assistant',
-                    text: text.substring(0, 2000)
-                });
-            }
+            const hasUserMsg = child.querySelector('[data-testid="user-message"]');
+            messages.push({
+                index: i,
+                role: hasUserMsg ? 'user' : 'assistant',
+                text: text.substring(0, 2000)
+            });
         });
 
         return JSON.stringify(messages);
@@ -135,16 +135,17 @@ def get_last_message(ws):
         const container = document.querySelector('.flex-1.flex.flex-col.px-4.max-w-3xl');
         if (!container) return null;
 
-        // Find the last child that doesn't have a user message (i.e., assistant response)
+        // Find the last child with actual content that isn't a user message
         const children = Array.from(container.children);
         for (let i = children.length - 1; i >= 0; i--) {
             const child = children[i];
+            const text = (child.innerText || '').trim();
+            // Skip empty elements
+            if (text.length < 20) continue;
+
             const hasUserMsg = child.querySelector('[data-testid="user-message"]');
             if (!hasUserMsg) {
-                const text = child.innerText.trim();
-                if (text.length > 20) {
-                    return text.substring(0, 3000);
-                }
+                return text.substring(0, 3000);
             }
         }
         return null;
