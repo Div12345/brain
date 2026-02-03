@@ -107,7 +107,7 @@ def execute_task(task: Task, dry_run: bool = False) -> ExecutionResult:
         )
 
     # Build claude command
-    cmd = ["claude", "-p", prompt, "--verbose"]
+    cmd = ["claude", "-p", prompt, "--verbose", "--dangerously-skip-permissions"]
 
     # Add tool restrictions based on mode
     if task.mode == "read-only":
