@@ -132,30 +132,33 @@ def execute_task(task: Task, dry_run: bool = False) -> ExecutionResult:
         # Stream output while checking for timeout
         start_time = time.time()
         
+        # Set stdout to non-blocking
+        os.set_blocking(process.stdout.fileno(), False)
+        
         while True:
             # Check for timeout
             if time.time() - start_time > timeout_secs:
                 process.kill()
                 raise subprocess.TimeoutExpired(cmd, timeout_secs, output="".join(captured_output).encode())
             
-            # Non-blocking read needed? No, readline is blocking but we have timeout loop
-            # Actually, standard readline loop is better, but we need to check timeout.
-            # Using selector or simple blocking read with short lines is usually fine,
-            # but proper way is poll.
+            # Check if process is still running
+            retcode = process.poll()
             
-            if process.poll() is not None:
-                # Process finished, read remaining output
-                for line in process.stdout:
-                    print(line, end='', flush=True)
-                    captured_output.append(line)
-                break
-                
-            line = process.stdout.readline()
-            if line:
-                print(line, end='', flush=True)
-                captured_output.append(line)
-            else:
-                # No output, slight sleep to prevent CPU spin
+            # Read available output
+            try:
+                # Read up to 1KB
+                chunk = process.stdout.read(1024)
+                if chunk:
+                    print(chunk, end='', flush=True)
+                    captured_output.append(chunk)
+                elif retcode is not None:
+                    # Process finished and no more output
+                    break
+                else:
+                    # No output yet, sleep briefly
+                    time.sleep(0.1)
+            except Exception:
+                # Should not happen with os.set_blocking, but safe fallback
                 time.sleep(0.1)
 
         result_code = process.returncode
