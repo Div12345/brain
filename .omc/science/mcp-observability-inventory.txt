@@ -1,0 +1,201 @@
+
+╔════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
+║                    MCP TOOLS OBSERVABILITY QUICK REFERENCE                                                       ║
+║                    Research Stage 3: Metrics & Observability Enablement                                          ║
+╚════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
+
+EXECUTIVE SUMMARY
+─────────────────
+Total MCP Tools:              37
+Tools with HIGH+ observability: 28 (75.7%)
+Premium observability tools:    9 (24.3% of total, critical for metrics)
+
+QUICK LOOKUP: By Metric Domain
+────────────────────────────────
+
+CODE QUALITY (7 metrics)
+├─ lsp_diagnostics [VERY_HIGH]        → Error counts, types, severity
+├─ lsp_diagnostics_directory [VERY_HIGH] → Project health snapshot
+├─ ast_grep_search [VERY_HIGH]        → Anti-patterns, code smells
+├─ lsp_code_actions [HIGH]            → Refactoring opportunity count
+└─ Capturable: Error trends, type safety %, code smell frequency
+
+STRUCTURAL (7 metrics)
+├─ lsp_find_references [VERY_HIGH]    → Symbol usage, coupling
+├─ lsp_document_symbols [HIGH]        → File complexity
+├─ lsp_workspace_symbols [HIGH]       → Symbol distribution
+├─ ast_grep_search [VERY_HIGH]        → Pattern prevalence
+└─ Capturable: Coupling density, dead code, naming compliance
+
+LEARNING (8 metrics)
+├─ aim_memory_link [VERY_HIGH]        → Relationship formation
+├─ aim_memory_read_all [VERY_HIGH]    → Knowledge base state
+├─ aim_memory_store [HIGH]            → Entity accumulation
+├─ aim_memory_add_facts [HIGH]        → Fact velocity
+└─ Capturable: Entity count, graph connectivity, relationship types
+
+CONTENT (8 metrics)
+├─ obsidian_global_search [VERY_HIGH] → Query patterns, discovery
+├─ obsidian_read_note [HIGH]          → Access patterns
+├─ obsidian_manage_tags [HIGH]        → Tag usage
+├─ obsidian_manage_frontmatter [HIGH] → Metadata adoption
+└─ Capturable: Vault size, note frequency, tag hierarchy
+
+RESEARCH (8 metrics)
+├─ research_start [HIGH]              → Research initiation
+├─ notebook_query [HIGH]              → Query patterns
+├─ studio_create [HIGH]               → Artifact velocity
+├─ search_papers [MEDIUM]             → Literature search
+└─ Capturable: Project count, query depth, artifact diversity
+
+CUSTOM (8+ metrics)
+├─ python_repl [VERY_HIGH]            → Arbitrary computation
+└─ Capturable: Correlations, trends, forecasts, anomalies
+
+
+QUICK DEPLOYMENT MATRIX
+─────────────────────────
+
+For: CODE QUALITY MONITORING
+  Month 1: Deploy lsp_diagnostics_directory (baseline)
+  Month 2: Add ast_grep_search (anti-patterns)
+  Month 3: Correlate with python_repl
+  Cost: 3 premium tools, high value
+
+For: LEARNING VELOCITY TRACKING
+  Month 1: Deploy aim_memory_read_all (baseline)
+  Month 2: Add aim_memory_link (relationships)
+  Month 3: Analyze patterns with python_repl
+  Cost: 2 premium tools, medium-high value
+
+For: KNOWLEDGE BASE HEALTH
+  Month 1: Deploy obsidian_global_search (baseline)
+  Month 2: Add obsidian_manage_tags (taxonomy)
+  Month 3: Correlate with aim_memory tools
+  Cost: 2-3 medium tools, medium value
+
+For: CUSTOM DERIVED METRICS (RECOMMENDED)
+  Deploy: python_repl immediately
+  Why: It amplifies ALL other tools, consumes their outputs
+  Cost: 1 premium tool, enables unlimited metric chains
+
+
+TOOL POTENCY RANKING (for metrics capture)
+─────────────────────────────────────────
+
+Rank  Tool                          Potency      Primary Use
+────  ───────────────────────────   ──────────   ────────────────────────────
+ 1    python_repl                   VERY_HIGH    Custom metrics, correlation, forecast
+ 2    lsp_diagnostics_directory     VERY_HIGH    Project health snapshot
+ 3    lsp_find_references           VERY_HIGH    Coupling, dead code analysis
+ 4    aim_memory_read_all           VERY_HIGH    Knowledge base metrics
+ 5    aim_memory_link               VERY_HIGH    Learning pattern analysis
+ 6    ast_grep_search               VERY_HIGH    Anti-pattern detection
+ 7    obsidian_global_search        VERY_HIGH    Content discovery metrics
+ 8    ast_grep_replace              VERY_HIGH    Refactoring impact measurement
+ 9    lsp_diagnostics               VERY_HIGH    Error count tracking
+────
+10    lsp_code_actions              HIGH        Refactoring opportunity count
+11    lsp_document_symbols          HIGH        File complexity
+12    lsp_workspace_symbols         HIGH        Symbol distribution
+13    lsp_rename                    HIGH        Refactoring impact
+14    lsp_goto_definition           HIGH        Navigation patterns
+15    lsp_hover                     HIGH        Type lookup frequency
+16    obsidian_read_note            HIGH        Access patterns
+17    obsidian_manage_tags          HIGH        Tag usage frequency
+18    obsidian_manage_frontmatter   HIGH        Metadata adoption %
+19    obsidian_search_replace       HIGH        Edit scope
+20    aim_memory_store              HIGH        Entity accumulation
+21    aim_memory_add_facts          HIGH        Fact velocity
+22    aim_memory_search             HIGH        Query effectiveness
+23    zotero_semantic_search        HIGH        Citation discovery
+24    zotero_get_annotations        HIGH        Annotation frequency
+25    notebook_query                HIGH        Query patterns
+26    research_start                HIGH        Research initiation
+27    studio_create                 HIGH        Artifact generation
+28    zotero_semantic_search        HIGH        Discovery patterns
+
+
+OBSERVABILITY WORKFLOW (RECOMMENDED CADENCE)
+─────────────────────────────────────────────
+
+DAILY (5 min)
+  └─ lsp_diagnostics (spot check errors on modified files)
+  └─ aim_memory_link (capture new relationships from work)
+
+WEEKLY (30 min)
+  └─ lsp_diagnostics_directory (error trend)
+  └─ aim_memory_read_all (knowledge base growth)
+  └─ obsidian_global_search (vault engagement)
+  └─ python_repl: aggregate into trend report
+
+MONTHLY (60 min)
+  └─ lsp_find_references (coupling analysis)
+  └─ ast_grep_search (anti-pattern sweep)
+  └─ Full knowledge graph analysis
+  └─ python_repl: comprehensive metrics dashboard
+
+
+INTEGRATION EXAMPLES
+──────────────────
+
+Example 1: Error Quality Trend
+  Tools: lsp_diagnostics_directory → python_repl
+  Steps:
+    1. lsp_diagnostics_directory --project /path → JSON output
+    2. python_repl: parse JSON, compute mean/trend
+    3. Store in aim_memory_store with timestamp
+    4. obsidian_search_replace: update metrics note
+
+Example 2: Learning Velocity
+  Tools: aim_memory_read_all → python_repl
+  Steps:
+    1. aim_memory_read_all → get total entities/relations
+    2. python_repl: compute growth rate vs previous month
+    3. Detect anomalies (suspicious drops/spikes)
+    4. Store findings in memory
+
+Example 3: Dead Code Detection
+  Tools: lsp_find_references → python_repl → obsidian
+  Steps:
+    1. lsp_find_references (all symbols with 0 refs) → CSV
+    2. python_repl: filter by file type, exclude tests
+    3. Store candidates in memory
+    4. obsidian: log findings with priority/risk
+
+
+CRITICAL CAPABILITIES ENABLED
+──────────────────────────────
+
+✓ Code Quality Trends     (lsp_diagnostics* + python_repl)
+✓ Knowledge Graph Growth  (aim_memory_* + python_repl)
+✓ Coupling Analysis       (lsp_find_references + python_repl)
+✓ Anti-Pattern Detection  (ast_grep_search + python_repl)
+✓ Content Discovery       (obsidian_global_search + python_repl)
+✓ Dead Code Detection     (lsp_find_references + python_repl)
+✓ Technical Debt Tracking (ast_grep_search + aim_memory)
+✓ Learning Velocity       (aim_memory_read_all + python_repl)
+✓ Correlation Analysis    (python_repl with any metrics pair)
+✓ Anomaly Detection       (python_repl with historical data)
+
+
+MOST IMPACTFUL DEPLOYMENTS (ROI ranking)
+────────────────────────────────────────
+
+HIGH ROI:
+  1. lsp_diagnostics_directory (reveals code quality status immediately)
+  2. python_repl (multiplies value of all other tools)
+  3. aim_memory_read_all (captures learning velocity baseline)
+
+MEDIUM ROI:
+  4. ast_grep_search (anti-pattern quantification)
+  5. lsp_find_references (coupling analysis)
+  6. obsidian_global_search (vault engagement metrics)
+
+MEDIUM-LOW ROI:
+  7. aim_memory_link (relationship tracking, requires interpretation)
+  8. zotero_semantic_search (citation patterns)
+
+LOW ROI (but useful context):
+  9. research_start (research project tracking)
+  10. notebook_query (query pattern logging)

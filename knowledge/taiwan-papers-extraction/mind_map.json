@@ -1,0 +1,163 @@
+{
+  "name": "Arterial Hemodynamics and Cardiovascular Risk",
+  "children": [
+    {
+      "name": "Blood Pressure Measurement",
+      "children": [
+        {
+          "name": "Brachial Cuff BP",
+          "children": [
+            {
+              "name": "Standard Management Basis"
+            },
+            {
+              "name": "Oscillometry Principle"
+            },
+            {
+              "name": "Population Average Algorithms"
+            }
+          ]
+        },
+        {
+          "name": "Central BP (CBP)",
+          "children": [
+            {
+              "name": "Aortic Systolic Pressure"
+            },
+            {
+              "name": "Superior Prognostic Value"
+            },
+            {
+              "name": "Estimation Methods"
+            },
+            {
+              "name": "NPMA Method (N/6 Denominator)"
+            },
+            {
+              "name": "Generalized Transfer Function (GTF)"
+            },
+            {
+              "name": "Pulse Waveform Analysis (PWA)"
+            }
+          ]
+        },
+        {
+          "name": "Patient-Specific Oscillometry",
+          "children": [
+            {
+              "name": "Physiologic Model Fitting"
+            },
+            {
+              "name": "Improved Accuracy in Stiff Arteries"
+            },
+            {
+              "name": "Brachial Artery Compliance Curve"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Arterial Stiffness and Aging",
+      "children": [
+        {
+          "name": "Pulse Wave Velocity (PWV)",
+          "children": [
+            {
+              "name": "Carotid-Femoral (Gold Standard)"
+            },
+            {
+              "name": "Brachial-Ankle (baPWV)"
+            },
+            {
+              "name": "Aortic Stiffness Index"
+            }
+          ]
+        },
+        {
+          "name": "Wave Reflection",
+          "children": [
+            {
+              "name": "Augmentation Index (AI)"
+            },
+            {
+              "name": "Backward Pressure Amplitude (Pb)"
+            },
+            {
+              "name": "Reflected Wave Transit Time (RWTT)"
+            }
+          ]
+        },
+        {
+          "name": "Arteriosclerosis vs. Atherosclerosis"
+        }
+      ]
+    },
+    {
+      "name": "Mathematical Modeling",
+      "children": [
+        {
+          "name": "Tube-Load (TL) Model",
+          "children": [
+            {
+              "name": "BP Wave Propagation"
+            },
+            {
+              "name": "Reflection Coefficient (RC)"
+            },
+            {
+              "name": "Digital Twin for AAA Monitoring"
+            }
+          ]
+        },
+        {
+          "name": "Oscillogram Modeling",
+          "children": [
+            {
+              "name": "Reduced Model"
+            },
+            {
+              "name": "Exponential-Linear (EL) Function"
+            },
+            {
+              "name": "Arterial Compliance Standard"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Clinical Conditions",
+      "children": [
+        {
+          "name": "Abdominal Aortic Aneurysm (AAA)",
+          "children": [
+            {
+              "name": "Aortic Geometry Changes"
+            },
+            {
+              "name": "EVAR Repair"
+            },
+            {
+              "name": "Non-imaging Surveillance"
+            }
+          ]
+        },
+        {
+          "name": "Cardiovascular Risk Predictors",
+          "children": [
+            {
+              "name": "Ankle-Brachial Index (ABI)"
+            },
+            {
+              "name": "Pulse Pressure (PP) Amplification"
+            },
+            {
+              "name": "Pulse Transit Time (PTT)"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

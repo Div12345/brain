@@ -1,0 +1,194 @@
+
+╔════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
+║                   RESEARCH STAGE 3 COMPLETION SUMMARY TABLE                                                      ║
+║              MCP Tools Inventory for Metrics & Observability Capture                                             ║
+╚════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
+
+┌─ RESEARCH FINDINGS ──────────────────────────────────────────────────────────────────────────────────────────────┐
+
+[TOOLS_TOTAL]         37 MCP tools available in this session
+[TOOLS_PREMIUM]       9 tools with VERY_HIGH observability potency
+[TOOLS_HIGH]          19 tools with HIGH observability potency
+[OBSERVABILITY_PCT]   75.7% of all tools have HIGH or VERY_HIGH potency
+
+[CATEGORY_DOMINANT]   LSP Tools (12 tools, 32.4%) → code quality & structure
+[CATEGORY_SECONDARY]  Memory Tools (8 tools, 21.6%) → learning & knowledge tracking
+[CATEGORY_TERTIARY]   Obsidian Tools (5 tools, 13.5%) → content & vault metrics
+
+[MULTIPLIER_TOOL]     python_repl is critical multiplier
+                      └─ Consumes outputs from ANY tool
+                      └─ Enables: correlation, forecasting, anomaly detection
+                      └─ Enables: custom metric chains
+
+[KEY_CAPABILITY]      LSP-based diagnostics provide ground truth for code quality
+                      └─ lsp_diagnostics_directory: project health snapshot
+                      └─ lsp_diagnostics: real-time error tracking
+                      └─ lsp_find_references: coupling & dead code analysis
+
+[LEARNING_TRACKING]   Memory tools enable knowledge velocity metrics
+                      └─ aim_memory_read_all: knowledge base state
+                      └─ aim_memory_link: relationship formation patterns
+                      └─ Combined with python_repl: trend analysis possible
+
+[CONTENT_METRICS]     Obsidian integration enables vault engagement tracking
+                      └─ obsidian_global_search: query effectiveness
+                      └─ obsidian_manage_tags: taxonomy evolution
+                      └─ Can correlate with memory growth
+
+[CRITICAL_CHAINS]     Tool chains that multiply value:
+                      ├─ lsp_diagnostics_directory → python_repl → anomaly detection
+                      ├─ lsp_find_references → python_repl → coupling trends
+                      ├─ aim_memory_read_all → python_repl → learning velocity
+                      ├─ ast_grep_search → python_repl → debt quantification
+                      └─ obsidian_global_search → python_repl → content discovery trends
+
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+┌─ PREMIUM OBSERVABILITY TOOLS (VERY_HIGH Potency) ────────────────────────────────────────────────────────────────┐
+
+Tool                          Category      Potency      Key Metrics                        Deployment Priority
+────────────────────────────  ────────────  ──────────   ──────────────────────────────   ──────────────────
+python_repl                   Data          VERY_HIGH    Custom metrics, correlation      IMMEDIATE (multiplier)
+lsp_diagnostics_directory     LSP           VERY_HIGH    Project health, error trends    MONTH 1
+lsp_find_references           LSP           VERY_HIGH    Coupling, dead code             MONTH 1
+aim_memory_read_all           Memory        VERY_HIGH    Knowledge base state            MONTH 1
+aim_memory_link               Memory        VERY_HIGH    Learning patterns               MONTH 2
+ast_grep_search               AST           VERY_HIGH    Anti-patterns, tech debt       MONTH 2
+obsidian_global_search        Obsidian      VERY_HIGH    Query patterns, discovery       MONTH 2
+ast_grep_replace              AST           VERY_HIGH    Refactoring impact             MONTH 3
+lsp_diagnostics               LSP           VERY_HIGH    Error tracking                  DAILY (continuous)
+
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+┌─ DEPLOYMENT ROADMAP ────────────────────────────────────────────────────────────────────────────────────────────┐
+
+PHASE 1 (Weeks 1-4): Foundation
+┌─────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│ Deploy python_repl                                                                                             │
+│   └─ Enables all downstream metric chains                                                                    │
+│   └─ Zero infrastructure dependencies                                                                        │
+│   └─ Can start processing outputs immediately                                                               │
+│                                                                                                              │
+│ Deploy lsp_diagnostics_directory                                                                             │
+│   └─ Weekly baseline snapshot of code quality                                                               │
+│   └─ Establishes error trend baseline                                                                       │
+│   └─ Requires: TypeScript/language server setup (already available)                                          │
+│                                                                                                              │
+│ Deploy aim_memory_read_all                                                                                   │
+│   └─ Establish knowledge base growth baseline                                                               │
+│   └─ Track entity/relationship counts weekly                                                                │
+│   └─ Zero setup required (already available)                                                                │
+└─────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+PHASE 2 (Weeks 5-8): Structural Analysis
+┌─────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│ Deploy lsp_find_references                                                                                   │
+│   └─ Monthly coupling analysis                                                                              │
+│   └─ Dead code detection                                                                                    │
+│   └─ Impact analysis for refactoring                                                                        │
+│                                                                                                              │
+│ Deploy ast_grep_search                                                                                      │
+│   └─ Anti-pattern quantification                                                                           │
+│   └─ Code smell detection                                                                                  │
+│   └─ Technical debt markers                                                                                │
+│                                                                                                              │
+│ Deploy aim_memory_link                                                                                      │
+│   └─ Relationship pattern analysis                                                                         │
+│   └─ Knowledge graph connectivity metrics                                                                  │
+│   └─ Learning effectiveness measurement                                                                    │
+└─────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+PHASE 3 (Weeks 9-12): Advanced Metrics
+┌─────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│ Deploy obsidian_global_search                                                                               │
+│   └─ Content discovery effectiveness                                                                       │
+│   └─ Vault engagement patterns                                                                             │
+│   └─ Query effectiveness tracking                                                                          │
+│                                                                                                              │
+│ Deploy ast_grep_replace                                                                                     │
+│   └─ Refactoring impact measurement                                                                        │
+│   └─ Modernization progress tracking                                                                       │
+│   └─ Code transformation analysis                                                                          │
+│                                                                                                              │
+│ Activate python_repl chains                                                                                 │
+│   └─ Correlation analysis across all metrics                                                               │
+│   └─ Trend forecasting                                                                                     │
+│   └─ Anomaly detection on historical data                                                                  │
+└─────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+┌─ METRIC CAPTURE MATRIX (What Each Tool Measures) ──────────────────────────────────────────────────────────────┐
+
+Tool                          Error   Type   Coupling  Debt   Learning  Content  Custom
+                              ────    ─────  ────────  ─────  ────────  ───────  ──────
+lsp_diagnostics               ✓✓      ✓✓     -         -      -         -        -
+lsp_diagnostics_directory     ✓✓✓     ✓✓     -         -      -         -        -
+lsp_find_references           -       -      ✓✓✓       ✓✓     -         -        -
+ast_grep_search               -       -      ✓         ✓✓✓    -         -        -
+ast_grep_replace              -       -      ✓✓        ✓✓✓    -         -        -
+aim_memory_read_all           -       -      -         -      ✓✓✓       -        -
+aim_memory_link               -       -      -         -      ✓✓✓       -        -
+aim_memory_add_facts          -       -      -         -      ✓✓        -        -
+obsidian_global_search        -       -      -         -      -         ✓✓✓      -
+obsidian_manage_tags          -       -      -         -      -         ✓✓       -
+obsidian_read_note            -       -      -         -      -         ✓✓       -
+python_repl                   ✓       ✓      ✓         ✓      ✓         ✓        ✓✓✓
+
+Legend: ✓ (captures some data), ✓✓ (captures detailed data), ✓✓✓ (primary tool for this metric)
+        - (not applicable)
+
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+┌─ ROI ANALYSIS (Impact per Tool) ────────────────────────────────────────────────────────────────────────────────┐
+
+HIGH ROI (Immediate value, low setup cost)
+┌─────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│ 1. python_repl           │ Multiplier tool, enables all downstream analysis chains                             │
+│ 2. lsp_diagnostics_directory │ Instant project health snapshot, reveals quality status immediately               │
+│ 3. aim_memory_read_all   │ Knowledge growth baseline, continuous learning measurement                          │
+└─────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+MEDIUM ROI (Significant value, moderate interpretation effort)
+┌─────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│ 4. ast_grep_search       │ Quantifies anti-patterns, enables debt tracking                                     │
+│ 5. lsp_find_references   │ Coupling analysis, dead code detection                                             │
+│ 6. obsidian_global_search│ Vault engagement, content discovery effectiveness                                  │
+└─────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+MEDIUM-LOW ROI (Context value, requires aggregation)
+┌─────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│ 7. aim_memory_link       │ Relationship tracking, patterns emerge over time                                   │
+│ 8. obsidian_manage_tags  │ Taxonomy evolution, requires manual interpretation                                │
+└─────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+┌─ CONCLUSION ────────────────────────────────────────────────────────────────────────────────────────────────────┐
+
+RESEARCH QUESTION ANSWERED: Which MCP tools enable metrics & observability capture?
+
+ANSWER:
+  ✓ 37 total tools available
+  ✓ 28 tools (75.7%) have HIGH or VERY_HIGH observability potential
+  ✓ 9 premium tools (VERY_HIGH) form the backbone of metrics capability
+  ✓ python_repl acts as universal multiplier for all metric chains
+  ✓ LSP tools provide ground truth for code quality metrics
+  ✓ Memory tools enable learning velocity tracking
+  ✓ Obsidian tools track content/knowledge engagement
+
+STRATEGIC RECOMMENDATIONS:
+  1. DEPLOY python_repl immediately (enables all chains)
+  2. Deploy lsp_diagnostics_directory weekly (code quality baseline)
+  3. Deploy aim_memory_read_all weekly (learning velocity baseline)
+  4. Chain tools via python_repl for derived metrics (correlations, forecasts)
+  5. Monthly deep analysis with ast_grep_search + lsp_find_references
+
+CRITICAL INSIGHT:
+  The real power is not in individual tools, but in CHAINING them through
+  python_repl. Each tool outputs raw metrics; python_repl transforms them
+  into actionable intelligence (trends, correlations, anomalies, forecasts).
+
+Next Research Stage: Implementation of the deployment roadmap (Phases 1-3)
+
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘

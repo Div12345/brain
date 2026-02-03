@@ -1,0 +1,213 @@
+{
+  "extraction_methods": [
+    {
+      "method": "Sequential Pattern Mining (SPM)",
+      "how_it_works": "Discovers temporal sequences in user activities, mining learning behaviors and temporal changes",
+      "pros": "Flexible in capturing relative arrangement of events, reveals similarities/differences in activities",
+      "cons": "Requires systematic preprocessing, parameter tuning; unreliable patterns need removal",
+      "complexity": "Medium-High",
+      "source": "Educational data SPM (arXiv 2302.01932)"
+    },
+    {
+      "method": "Temporal Mobile Access Patterns",
+      "how_it_works": "Mines patterns associated with location, time, and requested services from mobile data",
+      "pros": "Efficient discovery of temporal behaviors, context-aware (location + time)",
+      "cons": "Limited to mobile/location-based data, requires continuous data stream",
+      "complexity": "Medium",
+      "source": "ResearchGate mobile patterns study"
+    },
+    {
+      "method": "Semantic Search + Embeddings (RAG)",
+      "how_it_works": "Creates vector embeddings of content, identifies patterns via semantic similarity",
+      "pros": "Fast, accurate, works across diverse content types, real-time results",
+      "cons": "Requires vector database, computationally expensive for large datasets",
+      "complexity": "Medium",
+      "source": "Khoj AI, Quivr implementations"
+    },
+    {
+      "method": "Graph RAG with Temporal Edges",
+      "how_it_works": "Embeds structured knowledge as triples (subject-predicate-object) with temporal attributes",
+      "pros": "Captures relationships + temporal context, handles symbolic/relational structures",
+      "cons": "Complex to implement, requires graph database, high computational overhead",
+      "complexity": "High",
+      "source": "AgCyRAG cybersecurity patterns (CEUR-WS)"
+    },
+    {
+      "method": "LLM-Based Temporal Context Fusion",
+      "how_it_works": "LLMs fuse natural language summaries from recent (short-term) and historical (long-term) interactions",
+      "pros": "Natural language interface, captures nuance, temporally-aware embeddings",
+      "cons": "Expensive inference, requires fine-tuning, potential hallucinations",
+      "complexity": "Medium-High",
+      "source": "arXiv 2508.08512 temporal LLM study"
+    },
+    {
+      "method": "Behavior Pattern Mining with Context",
+      "how_it_works": "Combines smartphone connectivity, location, temporal context, weather, and demographics",
+      "pros": "Multi-modal context, explains 52.2% variance vs 34.5% baseline, LSTM for recurrence",
+      "cons": "Privacy concerns, requires extensive user data, model complexity",
+      "complexity": "High",
+      "source": "Scientific Reports context-aware study"
+    },
+    {
+      "method": "Smart Connections (Obsidian)",
+      "how_it_works": "Analyzes note content for semantic relationships, suggests links based on meaning not keywords",
+      "pros": "Meaning-based not keyword-based, reveals unexpected patterns, RAG integration",
+      "cons": "Limited to text notes, requires embeddings computation, initial setup overhead",
+      "complexity": "Low-Medium",
+      "source": "Obsidian Smart Connections plugin"
+    }
+  ],
+  "pattern_types": [
+    {
+      "type": "Temporal Sequences",
+      "example": "User reads about 'React hooks' \u2192 searches 'useEffect examples' \u2192 reads implementation guides",
+      "why_useful": "Predicts next learning step, surfaces relevant content proactively",
+      "surfacing_trigger": "User starts similar sequence (e.g., reads about new topic)"
+    },
+    {
+      "type": "Contextual Preferences",
+      "example": "User prefers technical deep-dives in evenings, quick summaries in mornings",
+      "why_useful": "Time-aware content formatting, adjusts detail level automatically",
+      "surfacing_trigger": "Time of day + detected reading pattern"
+    },
+    {
+      "type": "Topic Clusters",
+      "example": "Frequently accessed: {machine learning, Python, data visualization} together",
+      "why_useful": "Suggests related but not explicitly linked content, reveals knowledge gaps",
+      "surfacing_trigger": "User queries topic in cluster, accesses one cluster member"
+    },
+    {
+      "type": "Rare but High-Confidence Patterns",
+      "example": "Every 2 weeks, user reviews all notes tagged 'project-ideas'",
+      "why_useful": "Surfaces periodic review needs, suggests maintenance tasks",
+      "surfacing_trigger": "Temporal interval match (e.g., ~2 weeks since last review)"
+    },
+    {
+      "type": "Social/Collaborative Patterns",
+      "example": "Users with similar note structures also reference these external sources",
+      "why_useful": "Collaborative filtering for knowledge work, discovers new sources",
+      "surfacing_trigger": "User creates note similar to community patterns"
+    },
+    {
+      "type": "Seasonal/Periodic Patterns",
+      "example": "Increased queries about 'tax planning' every Q4, 'goal setting' every January",
+      "why_useful": "Anticipates cyclical needs, surfaces relevant archived content",
+      "surfacing_trigger": "Temporal match (season/month) + historical pattern"
+    },
+    {
+      "type": "Workflow Patterns",
+      "example": "Research \u2192 Draft \u2192 Review \u2192 Publish sequence across multiple projects",
+      "why_useful": "Suggests next workflow step, identifies stuck phases",
+      "surfacing_trigger": "User in known workflow phase, missing expected next action"
+    }
+  ],
+  "anti_patterns": [
+    {
+      "anti_pattern": "Generic Off-the-Shelf Models",
+      "why_fails": "68% users find generic personalization 'off-putting'; fails to capture brand/user nuance",
+      "source": "Baymard Institute 2023 survey"
+    },
+    {
+      "anti_pattern": "Static Models Without Real-Time Updates",
+      "why_fails": "Quickly outdated; personalization based on old data misses current behavior",
+      "source": "Tribe AI personalization strategies"
+    },
+    {
+      "anti_pattern": "Obvious Pattern Overload",
+      "why_fails": "Surfacing patterns user already knows creates noise, not insight",
+      "source": "Derived from Smart Connections approach"
+    },
+    {
+      "anti_pattern": "Pattern Recognition Without Context",
+      "why_fails": "AI excels at historical patterns but lacks contextual understanding; technically correct but misses user needs",
+      "source": "Optimal Workshop human-centered AI design"
+    },
+    {
+      "anti_pattern": "False Confidence in AI Outputs",
+      "why_fails": "Presenting probabilistic patterns as definitive creates overreliance or confusion",
+      "source": "AI UX anti-patterns (Medium Bootcamp)"
+    },
+    {
+      "anti_pattern": "No Temporal Decay",
+      "why_fails": "Treating 3-year-old patterns equally to yesterday's creates stale recommendations",
+      "source": "Derived from temporal dynamics research"
+    },
+    {
+      "anti_pattern": "Ignoring User Preference Changes",
+      "why_fails": "Conventional systems fail to account for evolving preferences over time",
+      "source": "Context-aware recommender systems review"
+    },
+    {
+      "anti_pattern": "Privacy-Invasive Data Collection",
+      "why_fails": "Excessive tracking for patterns damages trust, regulatory issues",
+      "source": "LSTM behavioral modeling considerations"
+    }
+  ],
+  "recommended_approach": {
+    "architecture": "Hybrid Multi-Layer Pattern Recognition System",
+    "layers": [
+      {
+        "layer": "Layer 1: Real-Time Contextual Capture",
+        "components": [
+          "Session metadata (time, location, device)",
+          "Activity type classification",
+          "Lightweight local storage"
+        ],
+        "tools": "Browser localStorage + simple JSON logs"
+      },
+      {
+        "layer": "Layer 2: Semantic Embedding & Indexing",
+        "components": [
+          "Vector embeddings of notes/interactions",
+          "Fast similarity search",
+          "Incremental index updates"
+        ],
+        "tools": "pgvector (PostgreSQL) or FAISS, sentence-transformers"
+      },
+      {
+        "layer": "Layer 3: Temporal Pattern Mining",
+        "components": [
+          "Sequential pattern mining on interaction logs",
+          "Temporal graph construction",
+          "Periodic pattern detection"
+        ],
+        "tools": "Custom Python (SPM algorithms), NetworkX for graphs"
+      },
+      {
+        "layer": "Layer 4: LLM-Powered Synthesis",
+        "components": [
+          "Short-term context (recent 5-10 interactions)",
+          "Long-term profile (aggregated patterns)",
+          "Natural language pattern explanations"
+        ],
+        "tools": "Claude/GPT-4 with RAG, custom prompt engineering"
+      },
+      {
+        "layer": "Layer 5: Intelligent Surfacing",
+        "components": [
+          "Relevance scoring (context + recency + confidence)",
+          "Anti-noise filtering (suppress obvious)",
+          "Proactive vs reactive modes"
+        ],
+        "tools": "Ranking algorithm, threshold tuning, A/B testing"
+      }
+    ],
+    "key_principles": [
+      "Privacy-first: All processing local or user-controlled",
+      "Temporal decay: Weight recent patterns higher (exponential decay)",
+      "Context-aware: Time, location, activity type inform pattern relevance",
+      "Continuous learning: Incremental updates, not batch retraining",
+      "Explainable: Users see WHY pattern was surfaced",
+      "User control: Easy to dismiss, adjust, or disable patterns"
+    ],
+    "implementation_steps": [
+      "Start simple: Track basic interactions (read, write, search) with timestamps",
+      "Build embeddings: Create vector index of existing notes/content",
+      "Mine sequences: Apply SPM to find common interaction chains",
+      "Add context: Layer in time-of-day, day-of-week patterns",
+      "LLM integration: Use for summarizing patterns + generating insights",
+      "Smart surfacing: Implement relevance scoring, test thresholds",
+      "Iterate: Monitor dismissal rate, adjust anti-noise filters"
+    ]
+  }
+}

@@ -1,0 +1,492 @@
+#!/usr/bin/env python3
+"""
+ccq - Claude Code Queue Scheduler
+
+Smart capacity-aware task scheduler for Claude Code.
+
+Usage:
+    ccq status          Show capacity, schedule phase, and queue status
+    ccq list            List pending tasks with priority scores
+    ccq run             Run next task (if capacity and schedule allow)
+    ccq run --all       Run all runnable tasks
+    ccq run --dry       Dry run (show what would execute)
+    ccq run --phase X   Override schedule phase (autonomous/buffer)
+    ccq budget          Show weekly budget status
+    ccq plan-week       Plan task distribution for the week
+    ccq logs            Show recent execution logs
+    ccq add <file>      Add task file to queue
+
+Examples:
+    ccq status
+    ccq budget
+    ccq run --dry --phase autonomous
+    ccq plan-week
+"""
+
+import sys
+import argparse
+import os
+from pathlib import Path
+
+import yaml
+
+# Resolve script location and add lib to path
+SCRIPT_DIR = Path(__file__).resolve().parent
+sys.path.insert(0, str(SCRIPT_DIR))
+os.chdir(SCRIPT_DIR)  # Ensure we're in the right directory for imports
+
+from lib.capacity import check_capacity, format_capacity, Capacity
+from lib.tasks import load_pending_tasks, Task, TASKS_DIR
+from lib.executor import execute_task, build_prompt
+from lib.log_utils import (
+    log_execution, generate_run_id, format_recent_logs, get_stats,
+    append_to_history, classify_error, estimate_tokens, get_history_stats,
+    LOGS_DIR,
+)
+from lib.budget import BudgetTracker, format_budget_status
+from lib.scheduler import Scheduler, ScheduleConfig, format_schedule_status
+from lib.task_queue import TaskQueue, ProjectConfig, load_projects_from_config, format_queue_status
+
+# Config file
+CONFIG_FILE = SCRIPT_DIR / "config.yaml"
+
+# Estimated tokens per percentage point (rough estimate)
+TOKENS_PER_PERCENT = 5000
+
+
+def load_config() -> dict:
+    """Load configuration from YAML file."""
+    if CONFIG_FILE.exists():
+        with open(CONFIG_FILE) as f:
+            return yaml.safe_load(f) or {}
+    return {}
+
+
+def estimate_available_tokens(cap: Capacity) -> int:
+    """Estimate available tokens from capacity percentage."""
+    available_pct = cap.available_percent
+    return int(available_pct * TOKENS_PER_PERCENT)
+
+
+def cmd_status(args):
+    """Show current capacity, schedule, and queue status."""
+    config = load_config()
+
+    print("=== CC Scheduler Status ===\n")
+
+    # Capacity
+    cap = check_capacity()
+    if cap:
+        print(f"Capacity: {format_capacity(cap)}")
+        print(f"  Available: ~{estimate_available_tokens(cap):,} tokens")
+        if cap.five_hour_resets_at:
+            # Convert UTC to local time for display
+            local_reset = cap.five_hour_resets_at.astimezone()
+            print(f"  5h resets: {local_reset.strftime('%H:%M')}")
+    else:
+        print("Capacity: Unable to check (no credentials or API error)")
+
+    print()
+
+    # Schedule
+    sched_config = ScheduleConfig.from_dict(config)
+    scheduler = Scheduler(sched_config)
+    phase = scheduler.get_current_phase()
+    can_run, reason = scheduler.should_run_now(phase)
+
+    print(f"Schedule Phase: {phase.upper()}")
+    print(f"  Can run: {'Yes' if can_run else 'No'} - {reason}")
+
+    print()
+
+    # Budget
+    budget = BudgetTracker(config)
+    summary = budget.get_week_summary()
+    print(f"Budget (today): {summary['remaining_today']:.1f}% remaining")
+    print(f"Budget (week):  {summary['remaining_week']:.1f}% remaining")
+
+    print()
+
+    # Queue
+    projects = load_projects_from_config(config)
+    queue = TaskQueue(projects)
+    queue.load_all()
+    q_summary = queue.summary()
+
+    print(f"Queue: {q_summary['total']} pending, {q_summary['runnable']} runnable, {q_summary['blocked']} blocked")
+
+    if q_summary['total'] > 0:
+        # Show top 5 by priority
+        runnable = queue.get_runnable_tasks()
+        if runnable:
+            ranked = scheduler.rank_tasks(runnable, cap)[:5]
+            print("\nTop tasks:")
+            for task, score in ranked:
+                print(f"  [{task.priority}] {task.name} (score: {score:.1f}, {task.estimated_tokens:,} tokens)")
+
+    print()
+
+    # Recent activity
+    stats = get_stats()
+    if stats["total"] > 0:
+        print(f"Stats: {stats['total']} runs, {stats['success_rate']}% success rate")
+
+
+def cmd_list(args):
+    """List pending tasks with priority scores."""
+    config = load_config()
+    cap = check_capacity()
+
+    sched_config = ScheduleConfig.from_dict(config)
+    scheduler = Scheduler(sched_config)
+
+    projects = load_projects_from_config(config)
+    queue = TaskQueue(projects)
+    queue.load_all()
+
+    tasks = queue.get_runnable_tasks() if not args.all else queue._tasks
+
+    if not tasks:
+        print("No pending tasks.")
+        return
+
+    ranked = scheduler.rank_tasks(tasks, cap)
+
+    print(f"Tasks ({len(ranked)}):\n")
+    for task, score in ranked:
+        deadline = task.deadline.strftime("%Y-%m-%d") if task.deadline else "-"
+        blocked = "" if queue.check_dependencies(task) else " [BLOCKED]"
+        project = f" ({task.project})" if task.project else ""
+
+        print(f"  [{task.priority}] {task.name}{project}{blocked}")
+        print(f"      score: {score:.1f}, tokens: {task.estimated_tokens:,}, deadline: {deadline}")
+        if task.tags:
+            print(f"      tags: {', '.join(task.tags)}")
+        print()
+
+
+def cmd_run(args):
+    """Run next task(s)."""
+    config = load_config()
+
+    # Initialize components
+    sched_config = ScheduleConfig.from_dict(config)
+    budget = BudgetTracker(config)
+    scheduler = Scheduler(sched_config, budget)
+
+    # Check schedule phase
+    phase = args.phase or scheduler.get_current_phase()
+    can_run, reason = scheduler.should_run_now(phase)
+
+    if not can_run and not args.force:
+        print(f"Schedule: {phase} - {reason}")
+        print("Use --force to override schedule restrictions.")
+        return 1
+
+    # Check capacity
+    cap = check_capacity()
+    if not cap:
+        print("Cannot check capacity. Aborting.")
+        return 1
+
+    if cap.is_limited and not args.force:
+        print(f"Rate limited: {format_capacity(cap)}")
+        print("Waiting for reset before running tasks.")
+        return 1
+
+    available_tokens = estimate_available_tokens(cap)
+    print(f"Capacity: {format_capacity(cap)}")
+    print(f"Available: ~{available_tokens:,} tokens")
+    print(f"Phase: {phase}\n")
+
+    # Load tasks
+    projects = load_projects_from_config(config)
+    queue = TaskQueue(projects)
+    queue.load_all()
+
+    runnable = queue.get_runnable_tasks(available_tokens)
+    if not runnable:
+        print(f"No tasks fit in available capacity ({available_tokens:,} tokens)")
+        return 0
+
+    # Plan session
+    to_run = scheduler.plan_session(runnable, cap, phase)
+
+    if not to_run:
+        print("No tasks selected for this session (budget constraints).")
+        return 0
+
+    if not args.all:
+        to_run = to_run[:1]
+
+    print(f"Tasks to run: {len(to_run)}\n")
+
+    # Start budget session
+    if not args.dry:
+        budget.start_session()
+
+    for task in to_run:
+        print(f"--- {task.name} ---")
+
+        # Check budget
+        fits, budget_reason = scheduler.check_budget(task)
+        if not fits and not args.force:
+            print(f"[SKIP] {budget_reason}")
+            continue
+
+        if args.dry:
+            print(f"[DRY RUN] Would execute: {task.name}")
+            print(f"Mode: {task.mode}, Timeout: {task.timeout}")
+            print(f"Prompt preview:\n{build_prompt(task)[:300]}...")
+            print()
+            continue
+
+        # Execute
+        run_id = generate_run_id()
+        # Pre-compute log file path for context injection
+        from datetime import datetime as dt
+        log_file_path = str(LOGS_DIR / f"{dt.now().strftime('%Y-%m-%d-%H%M')}-{task.name}.md")
+
+        cap_before = {
+            "five_hour_percent": cap.five_hour_percent,
+            "weekly_percent": cap.weekly_percent
+        }
+
+        print(f"Executing {task.name}...")
+        result = execute_task(task, run_id=run_id, log_file=log_file_path)
+
+        # Check capacity after
+        cap_after_obj = check_capacity()
+        cap_after = None
+        tokens_used = 0
+
+        if cap_after_obj:
+            cap_after = {
+                "five_hour_percent": cap_after_obj.five_hour_percent,
+                "weekly_percent": cap_after_obj.weekly_percent
+            }
+            # Estimate tokens used from capacity change
+            percent_used = cap_after_obj.five_hour_percent - cap.five_hour_percent
+            tokens_used = int(percent_used * TOKENS_PER_PERCENT)
+
+            # Record usage
+            budget.record_usage(task.name, tokens_used, percent_used)
+            budget.update_session(task.name, percent_used)
+
+        # Log result (detailed markdown log)
+        log_path = log_execution(
+            task_name=task.name,
+            run_id=run_id,
+            success=result.success,
+            exit_code=result.exit_code,
+            output=result.output,
+            started_at=result.started_at,
+            ended_at=result.ended_at,
+            duration_seconds=result.duration_seconds,
+            capacity_before=cap_before,
+            capacity_after=cap_after,
+            error=result.error,
+        )
+
+        # Log to history.jsonl for feedback loop (6-field minimal schema)
+        append_to_history(
+            task_id=task.name,
+            success=result.success,
+            error_type=classify_error(result.success, result.error, result.exit_code),
+            tokens=tokens_used if tokens_used else estimate_tokens(result.output),
+            duration_s=result.duration_seconds,
+            log_file=str(log_path),
+            timestamp=result.started_at.isoformat(),
+        )
+
+        # Report result
+        status = "✓ Completed" if result.success else "✗ Failed"
+        print(f"{status} in {result.duration_seconds:.1f}s")
+        if tokens_used:
+            print(f"Tokens used: ~{tokens_used:,}")
+        if result.error:
+            print(f"Error: {result.error}")
+        print(f"Log: {log_path}")
+        print()
+
+        # Update capacity estimate for next task
+        if cap_after_obj:
+            cap = cap_after_obj
+            available_tokens = estimate_available_tokens(cap)
+
+    return 0
+
+
+def cmd_budget(args):
+    """Show weekly budget status."""
+    config = load_config()
+    budget = BudgetTracker(config)
+
+    print("=== Weekly Budget ===\n")
+    print(format_budget_status(budget))
+
+    print()
+
+    # Show daily breakdown
+    weekly = budget.load_weekly_budget()
+    print("Daily breakdown:")
+    for day_str, alloc in sorted(weekly.daily_allocations.items()):
+        if hasattr(alloc, 'planned_percent'):
+            planned = alloc.planned_percent
+            actual = alloc.actual_percent
+            tasks = len(alloc.tasks_completed)
+        else:
+            planned = alloc.get('planned_percent', 0)
+            actual = alloc.get('actual_percent', 0)
+            tasks = len(alloc.get('tasks_completed', []))
+
+        bar_len = int(actual / 2)  # Scale to ~50 chars max
+        bar = "█" * bar_len + "░" * (int(planned / 2) - bar_len)
+        print(f"  {day_str}: {actual:.1f}%/{planned:.1f}% [{bar}] ({tasks} tasks)")
+
+
+def cmd_plan_week(args):
+    """Plan task distribution for the week."""
+    config = load_config()
+
+    sched_config = ScheduleConfig.from_dict(config)
+    budget = BudgetTracker(config)
+    scheduler = Scheduler(sched_config, budget)
+
+    projects = load_projects_from_config(config)
+    queue = TaskQueue(projects)
+    queue.load_all()
+
+    tasks = queue.get_runnable_tasks()
+
+    if not tasks:
+        print("No runnable tasks to plan.")
+        return
+
+    plan = scheduler.plan_week(tasks)
+
+    print("=== Weekly Task Plan ===\n")
+
+    total_tasks = 0
+    for day_str, task_names in sorted(plan.items()):
+        print(f"{day_str}:")
+        if task_names:
+            for name in task_names:
+                print(f"  - {name}")
+            total_tasks += len(task_names)
+        else:
+            print("  (no tasks)")
+        print()
+
+    print(f"Total: {total_tasks} tasks planned")
+
+    # Show unplanned tasks
+    planned_names = set()
+    for names in plan.values():
+        planned_names.update(names)
+
+    unplanned = [t for t in tasks if t.name not in planned_names]
+    if unplanned:
+        print(f"\nUnplanned ({len(unplanned)} tasks - exceeds weekly budget):")
+        for t in unplanned[:5]:
+            print(f"  - {t.name} ({t.estimated_tokens:,} tokens)")
+        if len(unplanned) > 5:
+            print(f"  ... and {len(unplanned) - 5} more")
+
+
+def cmd_logs(args):
+    """Show recent execution logs."""
+    print("Recent executions:\n")
+    print(format_recent_logs(args.n))
+    print()
+    stats = get_stats()
+    print(f"Total: {stats['total']} runs | Success: {stats['success_rate']}% | Avg: {stats['avg_duration']}s")
+
+    # Show feedback loop metrics from history.jsonl
+    h_stats = get_history_stats()
+    if h_stats["total"] > 0:
+        print(f"\nFeedback Loop Metrics (history.jsonl):")
+        print(f"  Success rate: {h_stats['success_rate']}%")
+        print(f"  Avg tokens: {h_stats['avg_tokens']:,}")
+        print(f"  Avg duration: {h_stats['avg_duration']}s")
+        if h_stats["error_types"]:
+            print(f"  Error types: {h_stats['error_types']}")
+
+
+def cmd_add(args):
+    """Add a task file to the queue."""
+    from shutil import copy
+
+    src = Path(args.file)
+    if not src.exists():
+        print(f"File not found: {src}")
+        return 1
+
+    dest_dir = TASKS_DIR / "pending"
+    dest_dir.mkdir(parents=True, exist_ok=True)
+    dest = dest_dir / src.name
+
+    copy(src, dest)
+    print(f"Added: {dest}")
+    return 0
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        description="Claude Code Queue Scheduler",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog=__doc__
+    )
+    subparsers = parser.add_subparsers(dest="command", help="Commands")
+
+    # status
+    subparsers.add_parser("status", help="Show capacity, schedule, and queue status")
+
+    # list
+    list_parser = subparsers.add_parser("list", help="List pending tasks")
+    list_parser.add_argument("--all", action="store_true", help="Include blocked tasks")
+
+    # run
+    run_parser = subparsers.add_parser("run", help="Run next task(s)")
+    run_parser.add_argument("--all", action="store_true", help="Run all runnable tasks")
+    run_parser.add_argument("--dry", action="store_true", help="Dry run only")
+    run_parser.add_argument("--phase", choices=["autonomous", "buffer", "briefing"],
+                           help="Override schedule phase")
+    run_parser.add_argument("--force", action="store_true", help="Ignore schedule/budget restrictions")
+
+    # budget
+    subparsers.add_parser("budget", help="Show weekly budget status")
+
+    # plan-week
+    subparsers.add_parser("plan-week", help="Plan task distribution for the week")
+
+    # logs
+    logs_parser = subparsers.add_parser("logs", help="Show recent logs")
+    logs_parser.add_argument("-n", type=int, default=10, help="Number of logs to show")
+
+    # add
+    add_parser = subparsers.add_parser("add", help="Add task file to queue")
+    add_parser.add_argument("file", help="Path to task file")
+
+    args = parser.parse_args()
+
+    if args.command == "status":
+        cmd_status(args)
+    elif args.command == "list":
+        cmd_list(args)
+    elif args.command == "run":
+        return cmd_run(args)
+    elif args.command == "budget":
+        cmd_budget(args)
+    elif args.command == "plan-week":
+        cmd_plan_week(args)
+    elif args.command == "logs":
+        cmd_logs(args)
+    elif args.command == "add":
+        return cmd_add(args)
+    else:
+        parser.print_help()
+
+
+if __name__ == "__main__":
+    sys.exit(main() or 0)

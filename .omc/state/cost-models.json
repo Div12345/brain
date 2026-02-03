@@ -1,0 +1,14 @@
+{
+  "000_verify_tiny": {
+    "avg_tokens": 5000,
+    "samples": 1
+  },
+  "metrics": {
+    "avg_tokens": 0,
+    "samples": 1
+  },
+  "verify": {
+    "avg_tokens": 5000,
+    "samples": 1
+  }
+}

@@ -1,6 +1,22 @@
 {
+  "permissions": {
+    "allow": [
+      "Bash(git *)",
+      "Bash(ls *)",
+      "Bash(cat *)",
+      "Bash(head *)",
+      "Bash(tail *)",
+      "Bash(wc *)",
+      "Bash(find /mnt/c/Users/din18/*)",
+      "Bash(find /home/div/brain/*)",
+      "Bash(echo *)",
+      "Bash(mkdir *)",
+      "Bash(claude mcp *)"
+    ]
+  },
   "enabledPlugins": {
     "hookify@claude-plugins-official": true,
-    "claude-md-management@claude-plugins-official": true
+    "claude-md-management@claude-plugins-official": true,
+    "github@claude-plugins-official": false
   }
 }

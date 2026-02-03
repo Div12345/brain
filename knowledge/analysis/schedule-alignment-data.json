@@ -1,0 +1,190 @@
+{
+  "research_date": "2026-02-03T03:36:29.661085",
+  "objective": "Human-AI schedule alignment patterns",
+  "findings": {
+    "timing_windows": {
+      "overnight": {
+        "window": "2:00 AM - 7:00 AM",
+        "ideal_for": [
+          "Deep research tasks",
+          "Code analysis/refactoring",
+          "Long-running builds",
+          "Batch processing",
+          "Self-improvement analysis"
+        ],
+        "capacity": "80-90% of daily token budget",
+        "rationale": "User sleeping, system idle, usage resets at midnight"
+      },
+      "morning_prep": {
+        "window": "7:00 AM - 9:00 AM",
+        "ideal_for": [
+          "Generate morning briefing",
+          "Summarize overnight work",
+          "Prepare questions for user",
+          "Quick priority checks"
+        ],
+        "capacity": "5-10% of daily token budget",
+        "rationale": "Before user starts work, provide context"
+      },
+      "work_hours": {
+        "window": "9:00 AM - 6:00 PM",
+        "ideal_for": [
+          "Interactive assistance",
+          "User-directed tasks",
+          "Quick lookups",
+          "Code reviews on demand"
+        ],
+        "capacity": "RESERVED - no autonomous tasks",
+        "rationale": "Full capacity available for user interaction"
+      },
+      "evening_handoff": {
+        "window": "6:00 PM - 10:00 PM",
+        "ideal_for": [
+          "User works with AI",
+          "Evening coding sessions",
+          "Generate overnight task list",
+          "Session summaries"
+        ],
+        "capacity": "10-15% for prep tasks only",
+        "rationale": "User may still be active, prepare for overnight"
+      }
+    },
+    "decision_framework": {
+      "autonomous_vs_review": {
+        "autonomous_ok": [
+          "Read operations (0% risk)",
+          "Analysis/research (low stakes)",
+          "Logging/documentation (reversible)",
+          "Pattern detection (informational)"
+        ],
+        "require_review": [
+          "Code modifications (medium risk)",
+          "Configuration changes (medium risk)",
+          "External API calls (medium risk)",
+          "Multi-file refactoring (high complexity)"
+        ],
+        "require_approval": [
+          "Delete operations (high risk)",
+          "Financial/security changes (critical)",
+          "Publishing/deployment (irreversible)",
+          "User communication (reputation)"
+        ]
+      },
+      "confidence_thresholds": {
+        ">90%": "Auto-proceed with notification",
+        "70-90%": "Generate plan, queue for morning review",
+        "50-70%": "Generate questions for user",
+        "<50%": "Skip, mark as needs-user-input"
+      }
+    },
+    "capacity_management": {
+      "token_allocation": {
+        "overnight_batch": 0.8,
+        "morning_prep": 0.08,
+        "evening_prep": 0.07,
+        "emergency_reserve": 0.05
+      },
+      "task_prioritization": [
+        "1. User-directed (immediate)",
+        "2. Blocked on user input (queue for next interaction)",
+        "3. High-confidence autonomous (overnight)",
+        "4. Research/prep (overnight)",
+        "5. Low-priority analysis (if capacity remains)"
+      ]
+    },
+    "question_generation_timing": {
+      "during_overnight": {
+        "strategy": "Batch questions, don't interrupt",
+        "mechanism": "Write to prompts/pending/*.md",
+        "format": "Structured with context, multiple choice when possible"
+      },
+      "morning_delivery": {
+        "strategy": "Present in morning briefing",
+        "priority": "Critical first, nice-to-have last",
+        "ux": "Quick-answer format (yes/no, A/B/C options)"
+      },
+      "work_hours": {
+        "strategy": "Ask immediately if blocking progress",
+        "threshold": "Only if confidence < 50% AND high priority"
+      }
+    },
+    "session_handoff_protocol": {
+      "evening_checklist": [
+        "Summarize today's work",
+        "Identify incomplete tasks",
+        "Generate overnight task list",
+        "Estimate token requirements",
+        "Flag items needing user input"
+      ],
+      "morning_checklist": [
+        "Report overnight completion status",
+        "Present questions batch",
+        "Highlight failures/blockers",
+        "Suggest today's priorities"
+      ]
+    }
+  },
+  "recommendations": {
+    "time_based_rules": {
+      "rule_1": {
+        "time": "2:00 AM - 7:00 AM",
+        "action": "Run autonomous research, analysis, builds",
+        "constraint": "No user interaction, batch questions",
+        "token_limit": "80% of daily budget"
+      },
+      "rule_2": {
+        "time": "7:00 AM - 9:00 AM",
+        "action": "Generate morning briefing, present overnight results",
+        "constraint": "Summarize, don't start new work",
+        "token_limit": "8% of daily budget"
+      },
+      "rule_3": {
+        "time": "9:00 AM - 6:00 PM",
+        "action": "FULL RESERVE for user interaction",
+        "constraint": "No autonomous tasks, respond to user only",
+        "token_limit": "Available on demand"
+      },
+      "rule_4": {
+        "time": "6:00 PM - 10:00 PM",
+        "action": "Assist user, prepare overnight plan",
+        "constraint": "User may be active, light prep only",
+        "token_limit": "7% for prep tasks"
+      },
+      "rule_5": {
+        "time": "10:00 PM - 2:00 AM",
+        "action": "No activity (buffer period)",
+        "constraint": "User may be doing late night work",
+        "token_limit": "5% emergency reserve"
+      }
+    },
+    "capacity_preservation": {
+      "strategy": "Never consume work-hours capacity with scheduled tasks",
+      "implementation": [
+        "Schedule all autonomous work 2:00-7:00 AM",
+        "Use token tracking to stay within 80% limit",
+        "Pause overnight run if approaching limit",
+        "Alert user if emergency reserve needed"
+      ]
+    },
+    "user_input_handling": {
+      "overnight_blocking": {
+        "problem": "Task needs user input mid-execution",
+        "solution": "Write question to prompts/pending/*.md, skip task, continue with others",
+        "resume": "User answers in morning, task resumes next night"
+      },
+      "work_hours_blocking": {
+        "problem": "Task needs user input during interactive session",
+        "solution": "Ask immediately if confidence < 50% AND high priority",
+        "fallback": "Queue for async answer if not urgent"
+      }
+    },
+    "implementation_architecture": {
+      "scheduler": "systemd timer (Linux) or launchd (macOS)",
+      "trigger_time": "2:00 AM daily",
+      "worker_script": "claude-worker.sh with token tracking",
+      "state_management": "brain/context/session-state.md",
+      "question_queue": "brain/prompts/pending/*.md",
+      "morning_briefing": "Generated at 7:00 AM, saved to brain/logs/briefings/"
+    }
+  }
+}

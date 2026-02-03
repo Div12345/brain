@@ -1,0 +1,20 @@
+[project]
+name = "claude-desktop-mcp"
+version = "0.1.0"
+description = "MCP server to control Claude Desktop via Chrome DevTools Protocol"
+requires-python = ">=3.10"
+dependencies = [
+    "mcp>=1.0.0",
+    "requests>=2.28.0",
+    "websocket-client>=1.6.0",
+    "pydantic>=2.0.0",
+    "watchdog>=3.0.0",
+]
+
+[project.scripts]
+claude-desktop-mcp = "server:main"
+watch-queue = "scripts.watch_queue:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

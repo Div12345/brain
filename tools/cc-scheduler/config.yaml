@@ -1,0 +1,116 @@
+# CC Scheduler Configuration
+# Phase 2: Smart Scheduling Layer
+
+# =============================================================================
+# Schedule Windows (based on your ActivityWatch patterns)
+# =============================================================================
+# Your pattern: Peak at 3 AM, sleep ~8 AM - 2 PM
+# Autonomous runs while you sleep, briefing when you wake
+schedule:
+  autonomous_start: "08:00"   # Start autonomous after you go to sleep
+  autonomous_end: "14:00"     # End before you wake (~2 PM)
+  briefing_time: "14:00"      # When you wake - review results
+  reserved_start: "20:00"     # Your evening peak - no autonomous
+  reserved_end: "08:00"       # End of your active hours
+
+# =============================================================================
+# Budget Allocation
+# =============================================================================
+budget:
+  # Per-phase allocation (fraction of daily budget)
+  autonomous: 0.80            # 80% for autonomous work
+  briefing: 0.08              # 8% for briefing summaries
+  buffer: 0.12                # 12% buffer for unexpected
+
+  # Daily allocations (percent of weekly)
+  daily_allocations:
+    monday: 15
+    tuesday: 15
+    wednesday: 15
+    thursday: 15
+    friday: 10
+    saturday: 10
+    sunday: 10
+    # Reserve 10% for user-directed work
+
+# =============================================================================
+# Project Configuration
+# =============================================================================
+projects:
+  - path: ~/brain/tasks
+    name: brain
+    boost: 0                  # Base priority
+
+  - path: ~/vault/tasks
+    name: vault
+    boost: 10                 # Slight boost for vault tasks
+
+  # Add more projects as needed:
+  # - path: ~/auditing/tasks
+  #   name: auditing
+  #   boost: 20
+
+# =============================================================================
+# Priority Scoring Weights
+# =============================================================================
+weights:
+  user_priority: 100          # Weight for user-assigned priority (1-10)
+  urgency: 50                 # Weight for deadline proximity
+  cost_efficiency: 30         # Weight for token efficiency
+  project_boost: 20           # Weight for project-level boost
+  dependency_penalty: 10      # Penalty per unmet dependency
+
+# =============================================================================
+# Confidence Routing
+# =============================================================================
+confidence:
+  auto_proceed: 90            # >= 90%: execute autonomously
+  review_threshold: 70        # >= 70%: execute but flag for review
+  question_threshold: 50      # >= 50%: ask user before proceeding
+                              # < 50%: skip task
+
+# =============================================================================
+# Paths (relative to brain repo root)
+# =============================================================================
+paths:
+  brain_root: ~/brain
+  tasks_pending: tasks/pending
+  tasks_active: tasks/active
+  tasks_completed: tasks/completed
+  tasks_failed: tasks/failed
+  logs: logs/scheduler
+  state: .omc/state
+
+# =============================================================================
+# Execution Defaults
+# =============================================================================
+defaults:
+  mode: autonomous            # Default execution mode
+  timeout: 30m                # Default timeout
+  working_dir: ~/brain        # Working directory for tasks
+
+# =============================================================================
+# Claude CLI Configuration
+# =============================================================================
+claude:
+  command: claude
+  # For autonomous runs, use --dangerously-skip-permissions
+  autonomous_flags:
+    - "--dangerously-skip-permissions"
+  allowed_tools:
+    - "Read"
+    - "Glob"
+    - "Grep"
+    - "Write"
+    - "Edit"
+    - "Bash"
+    - "WebSearch"
+    - "WebFetch"
+
+# =============================================================================
+# Capacity Thresholds
+# =============================================================================
+capacity:
+  min_percent: 10             # Minimum capacity to start tasks
+  warning_percent: 20         # Warn when below this
+  stop_percent: 5             # Hard stop below this
