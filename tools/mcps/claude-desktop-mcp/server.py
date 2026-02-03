@@ -65,7 +65,7 @@ def get_conversations(ws):
         const items = document.querySelectorAll('a[href*="/chat/"]');
         const convos = [];
         items.forEach((el, i) => {
-            if (i < 30) {
+            if (i < 50) {
                 const href = el.href || '';
                 const id = href.split('/chat/').pop()?.split('?')[0] || '';
                 const title = (el.innerText || '').trim().substring(0, 100);
@@ -77,6 +77,28 @@ def get_conversations(ws):
     """
     result = eval_js(ws, js)
     return json.loads(result) if result else []
+
+def navigate_to_chat(ws, chat_id):
+    """Navigate to a specific conversation."""
+    url = f"https://claude.ai/chat/{chat_id}"
+    js = f"window.location.href = '{url}'"
+    eval_js(ws, js)
+    time.sleep(2)  # Wait for navigation
+    return {"success": True, "navigated_to": url}
+
+def create_new_chat(ws):
+    """Create a new conversation."""
+    js = "window.location.href = 'https://claude.ai/new'"
+    eval_js(ws, js)
+    time.sleep(1)
+    return {"success": True, "url": "https://claude.ai/new"}
+
+def search_conversations(ws, query):
+    """Search conversations by title."""
+    convos = get_conversations(ws)
+    query_lower = query.lower()
+    matches = [c for c in convos if query_lower in c.get('title', '').lower()]
+    return matches
 
 def get_messages(ws):
     """Get all messages from conversation."""
@@ -208,6 +230,33 @@ async def list_tools() -> list[Tool]:
             name="claude_desktop_list",
             description="List all conversations from Claude Desktop sidebar.",
             inputSchema={"type": "object", "properties": {}}
+        ),
+        Tool(
+            name="claude_desktop_navigate",
+            description="Navigate to a specific conversation by ID.",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "chat_id": {"type": "string", "description": "Conversation ID to navigate to"}
+                },
+                "required": ["chat_id"]
+            }
+        ),
+        Tool(
+            name="claude_desktop_new",
+            description="Create a new conversation in Claude Desktop.",
+            inputSchema={"type": "object", "properties": {}}
+        ),
+        Tool(
+            name="claude_desktop_search",
+            description="Search conversations by title.",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "query": {"type": "string", "description": "Search query to match against conversation titles"}
+                },
+                "required": ["query"]
+            }
         )
     ]
 
@@ -270,6 +319,24 @@ async def call_tool(name: str, arguments: dict[str, Any]) -> list[TextContent]:
             return [TextContent(type="text", text=json.dumps({
                 "conversations": convos,
                 "total": len(convos)
+            }))]
+
+        elif name == "claude_desktop_navigate":
+            chat_id = arguments.get("chat_id", "")
+            result = navigate_to_chat(ws, chat_id)
+            return [TextContent(type="text", text=json.dumps(result))]
+
+        elif name == "claude_desktop_new":
+            result = create_new_chat(ws)
+            return [TextContent(type="text", text=json.dumps(result))]
+
+        elif name == "claude_desktop_search":
+            query = arguments.get("query", "")
+            matches = search_conversations(ws, query)
+            return [TextContent(type="text", text=json.dumps({
+                "query": query,
+                "matches": matches,
+                "total": len(matches)
             }))]
 
         else:
