@@ -13,11 +13,11 @@ agent: overnight
 > **COMPACTION RESILIENCE**: Read this first after context reset.
 
 ## Active Agent
-- **overnight-A** (Desktop Claude): Research + infrastructure ✓
+- **scientist-001** (Claude Code): Bootstrap research ✓
 
 ## Session Summary (Extended)
 
-**Research Docs Created (9):**
+**Research Docs Created (10):**
 - [[knowledge/research/recursive-self-improvement]]
 - [[knowledge/research/proactive-assistant-patterns]]
 - [[knowledge/research/multi-agent-coordination]]
@@ -27,6 +27,7 @@ agent: overnight
 - [[knowledge/research/ai-memory-systems]]
 - [[knowledge/research/claude-code-ecosystem]]
 - [[knowledge/research/context-window-management]]
+- [[knowledge/research/self-referential-bootstrap]]
 
 **Patterns Created (2):**
 - [[knowledge/patterns/multi-agent-coordination]]
