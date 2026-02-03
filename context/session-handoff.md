@@ -85,18 +85,25 @@
 
 ## What Worked / What Didn't (Last Session)
 
-### Worked
+### Worked (2026-02-02)
 - Deep research with parallel scientist agents (5 stages)
 - Vault analysis revealing actual usage patterns
 - Extracting core principles from existing docs
+- Comprehensive tool ecosystem research (see knowledge/research/ai-tools-ecosystem-2026-02-02.md)
 
 ### Didn't Work
 - First plan was too passive (read notes, generate focus list)
 - Ralplan iteration 1 failed critic review (didn't deliver immediate value)
 - Asking same questions repeatedly instead of using gathered context
+- PreToolUse.js hook not active (omc's boulder context overrides it)
 
 ### Lesson
 Read this file first. Don't ask what I'm working on - you know.
+
+### Key Discovery (2026-02-02)
+**Hookify** uses markdown files in `.claude/` for rules - NOT settings.json hooks.
+**oh-my-claudecode** already has context injection via `context-injector` feature.
+The "boulder never stops" message comes from omc's continuation-enforcement.
 
 ---
 
