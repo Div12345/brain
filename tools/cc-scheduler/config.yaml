@@ -1,0 +1,41 @@
+# CC Scheduler Configuration
+# See DESIGN.md for documentation
+
+# Paths (relative to brain repo root)
+paths:
+  brain_root: ~/brain
+  tasks_pending: tasks/pending
+  tasks_active: tasks/active
+  tasks_completed: tasks/completed
+  tasks_failed: tasks/failed
+  agents: agents
+  rules: agents/rules.md
+  logs: logs/scheduler
+  context_priorities: context/priorities.md
+  context_agents: context/active-agents.md
+
+# Execution defaults
+defaults:
+  agent: null                    # no agent persona by default
+  mode: read-only                # safe default (read-only | plan-first | autonomous)
+  timeout: 30m
+  working_dir: ~/brain
+
+# Scheduling
+schedule:
+  enabled: false
+  time: "00:05"                  # 12:05 AM
+  check_capacity: true
+  retry_if_no_capacity: true
+  retry_interval: 15m
+  max_retries: 4
+
+# Capacity checking
+capacity:
+  min_percent: 10                # at least 10% remaining to start
+  min_time_minutes: 30           # at least 30 min remaining
+
+# Claude CLI
+claude:
+  command: claude
+  # Additional flags can be added here

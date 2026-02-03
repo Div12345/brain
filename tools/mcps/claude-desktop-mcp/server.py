@@ -58,6 +58,26 @@ def eval_js(ws, expression, cmd_id=1):
     }, cmd_id)
     return result.get("result", {}).get("result", {}).get("value")
 
+def get_conversations(ws):
+    """Get list of conversations from sidebar."""
+    js = """
+    (function() {
+        const items = document.querySelectorAll('a[href*="/chat/"]');
+        const convos = [];
+        items.forEach((el, i) => {
+            if (i < 30) {
+                const href = el.href || '';
+                const id = href.split('/chat/').pop()?.split('?')[0] || '';
+                const title = (el.innerText || '').trim().substring(0, 100);
+                if (id && title) convos.push({id, title, href});
+            }
+        });
+        return JSON.stringify(convos);
+    })()
+    """
+    result = eval_js(ws, js)
+    return json.loads(result) if result else []
+
 def get_messages(ws):
     """Get all messages from conversation."""
     js = """
@@ -183,6 +203,11 @@ async def list_tools() -> list[Tool]:
             name="claude_desktop_info",
             description="Get current Claude Desktop conversation info (ID, URL, title).",
             inputSchema={"type": "object", "properties": {}}
+        ),
+        Tool(
+            name="claude_desktop_list",
+            description="List all conversations from Claude Desktop sidebar.",
+            inputSchema={"type": "object", "properties": {}}
         )
     ]
 
@@ -238,6 +263,13 @@ async def call_tool(name: str, arguments: dict[str, Any]) -> list[TextContent]:
                 "url": url,
                 "conversation_id": conv_id,
                 "title": title
+            }))]
+
+        elif name == "claude_desktop_list":
+            convos = get_conversations(ws)
+            return [TextContent(type="text", text=json.dumps({
+                "conversations": convos,
+                "total": len(convos)
             }))]
 
         else:
