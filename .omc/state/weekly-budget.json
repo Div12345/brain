@@ -12,9 +12,28 @@
     },
     "2026-02-03": {
       "planned_percent": 15.0,
-      "actual_percent": 0.0,
+      "actual_percent": 2.0,
       "tasks_planned": [],
-      "tasks_completed": []
+      "tasks_completed": [
+        {
+          "name": "000_verify_tiny",
+          "tokens": 5000,
+          "percent": 1.0,
+          "timestamp": "2026-02-03T05:22:46.161953"
+        },
+        {
+          "name": "metrics-and-learning",
+          "tokens": 0,
+          "percent": 0.0,
+          "timestamp": "2026-02-03T08:36:17.377387"
+        },
+        {
+          "name": "verify-tiny",
+          "tokens": 5000,
+          "percent": 1.0,
+          "timestamp": "2026-02-03T15:11:24.120696"
+        }
+      ]
     },
     "2026-02-04": {
       "planned_percent": 15.0,

@@ -43,8 +43,7 @@ def parse_timeout(timeout_str: str) -> int:
 
 
 def build_prompt(task: Task) -> str:
-    """Build execution prompt from task."""
-    # Include task body as the main prompt
+    """Build execution prompt from task with skill prefix."""
     prompt = task.body
 
     # Add mode-specific instructions
@@ -53,7 +52,31 @@ def build_prompt(task: Task) -> str:
     elif task.mode == "plan-first":
         prompt = f"[PLAN-FIRST MODE - Create a plan before executing]\n\n{prompt}"
 
+    # Prefix with skill invocation if specified
+    skill = getattr(task, 'skill', None)
+    if skill:
+        prompt = f"/oh-my-claudecode:{skill} {prompt}"
+
     return prompt
+
+
+def build_command(task: Task, prompt: str) -> list[str]:
+    """Build claude CLI command with model routing."""
+    cmd = ["claude", "-p", prompt, "--verbose", "--dangerously-skip-permissions"]
+
+    # Model routing based on task.model_hint
+    model_hint = getattr(task, 'model_hint', 'sonnet')
+    if model_hint == "haiku":
+        cmd.extend(["--model", "haiku"])
+    elif model_hint == "opus":
+        cmd.extend(["--model", "opus"])
+    # sonnet is default, no flag needed
+
+    # Tool restrictions for read-only mode
+    if task.mode == "read-only":
+        cmd.extend(["--allowedTools", "Read,Glob,Grep,WebSearch,WebFetch"])
+
+    return cmd
 
 
 def move_task(task: Task, from_status: str, to_status: str) -> Path:
@@ -67,7 +90,7 @@ def move_task(task: Task, from_status: str, to_status: str) -> Path:
     return new_path
 
 
-def execute_task(task: Task, dry_run: bool = False) -> ExecutionResult:
+def execute_task(task: Task, dry_run: bool = False, run_id: str = None, log_file: str = None) -> ExecutionResult:
     """
     Execute a task using claude CLI.
 
@@ -81,11 +104,12 @@ def execute_task(task: Task, dry_run: bool = False) -> ExecutionResult:
     prompt = build_prompt(task)
 
     if dry_run:
+        cmd = build_command(task, prompt)
         return ExecutionResult(
             task_name=task.name,
             success=True,
             exit_code=0,
-            output=f"[DRY RUN] Would execute: {task.name}\nPrompt: {prompt[:200]}...",
+            output=f"[DRY RUN] Would execute: {task.name}\nCommand: {' '.join(cmd[:6])}...\nSkill: {getattr(task, 'skill', None)}\nModel: {getattr(task, 'model_hint', 'sonnet')}\nPrompt: {prompt[:200]}...",
             started_at=started_at,
             ended_at=datetime.now(),
             duration_seconds=0,
@@ -106,12 +130,8 @@ def execute_task(task: Task, dry_run: bool = False) -> ExecutionResult:
             error=f"Failed to move task to active: {e}"
         )
 
-    # Build claude command
-    cmd = ["claude", "-p", prompt, "--verbose", "--dangerously-skip-permissions"]
-
-    # Add tool restrictions based on mode
-    if task.mode == "read-only":
-        cmd.extend(["--allowedTools", "Read,Glob,Grep,WebSearch,WebFetch"])
+    # Build claude command with skill/model routing
+    cmd = build_command(task, prompt)
 
     try:
         print(f"[{datetime.now().strftime('%H:%M:%S')}] Starting claude process...")
@@ -124,7 +144,15 @@ def execute_task(task: Task, dry_run: bool = False) -> ExecutionResult:
             text=True,
             bufsize=1,  # Line buffered
             cwd=str(Path.home() / "brain"),
-            env={**os.environ, "CLAUDE_CODE_ENTRYPOINT": "ccq-scheduler"}
+            env={
+                **os.environ,
+                "CLAUDE_CODE_ENTRYPOINT": "ccq-scheduler",
+                # Context injection for scheduled tasks
+                "CCQ_TASK_ID": task.name,
+                "CCQ_RUN_ID": run_id or "",
+                "CCQ_LOG_FILE": log_file or "",
+                "CCQ_TASK_FILE": str(task.path),
+            }
         )
 
         captured_output = []

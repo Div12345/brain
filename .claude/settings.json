@@ -1,8 +1,4 @@
 {
-  "enabledPlugins": {
-    "hookify@claude-plugins-official": true,
-    "claude-md-management@claude-plugins-official": true
-  },
   "permissions": {
     "allow": [
       "Bash(git *)",
@@ -17,5 +13,10 @@
       "Bash(mkdir *)",
       "Bash(claude mcp *)"
     ]
+  },
+  "enabledPlugins": {
+    "hookify@claude-plugins-official": true,
+    "claude-md-management@claude-plugins-official": true,
+    "github@claude-plugins-official": false
   }
 }

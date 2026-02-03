@@ -16,6 +16,11 @@ from datetime import datetime
 BRAIN_ROOT = Path.home() / "brain"
 TASKS_DIR = BRAIN_ROOT / "tasks"
 
+# Valid values for schema validation
+VALID_SKILLS = [None, "autopilot", "ralph", "ultrawork", "ecomode", "plan", "analyze", "deepsearch", "tdd"]
+VALID_MODEL_HINTS = ["haiku", "sonnet", "opus"]
+
+
 @dataclass
 class Task:
     """A scheduled task parsed from markdown file."""
@@ -31,6 +36,11 @@ class Task:
     body: str = ""  # Task content after frontmatter
     project: str = ""  # Project name (set by queue)
     project_boost: int = 0  # Priority boost from project config
+    # Extended schema for routing
+    skill: Optional[str] = None  # OMC skill to use
+    model_hint: str = "sonnet"  # haiku | sonnet | opus
+    mcps_required: List[str] = field(default_factory=list)
+    inject_capabilities: bool = False
 
     @property
     def is_runnable(self) -> bool:
@@ -118,6 +128,18 @@ def parse_task_file(path: Path) -> Optional[Task]:
             except ValueError:
                 pass
 
+        # Extract and validate new fields
+        skill = meta.get('skill')
+        if skill is not None and skill not in VALID_SKILLS:
+            raise ValueError(f"Invalid skill: {skill}. Valid: {VALID_SKILLS}")
+
+        model_hint = meta.get('model_hint', 'sonnet')
+        if model_hint not in VALID_MODEL_HINTS:
+            raise ValueError(f"Invalid model_hint: {model_hint}. Valid: {VALID_MODEL_HINTS}")
+
+        mcps_required = meta.get('mcps_required', [])
+        inject_capabilities = meta.get('inject_capabilities', False)
+
         return Task(
             name=meta.get('name', path.stem),
             path=path,
@@ -128,7 +150,11 @@ def parse_task_file(path: Path) -> Optional[Task]:
             tags=meta.get('tags', []),
             depends_on=meta.get('depends_on', []),
             deadline=deadline,
-            body=body
+            body=body,
+            skill=skill,
+            model_hint=model_hint,
+            mcps_required=mcps_required if isinstance(mcps_required, list) else [],
+            inject_capabilities=inject_capabilities,
         )
     except Exception as e:
         print(f"Error parsing {path}: {e}")

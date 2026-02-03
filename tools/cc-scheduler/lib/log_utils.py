@@ -119,6 +119,96 @@ def append_to_index(entry: dict):
         f.write(json.dumps(entry) + "\n")
 
 
+def classify_error(success: bool, error: Optional[str], exit_code: int) -> Optional[str]:
+    """Classify error type for feedback loop analysis."""
+    if success:
+        return None
+    if error:
+        error_lower = error.lower()
+        if "timeout" in error_lower or "timed out" in error_lower:
+            return "timeout"
+    if exit_code != 0:
+        return "exit_error"
+    return "exception"
+
+
+def estimate_tokens(output: str) -> int:
+    """Rough token estimate from output length (~4 chars per token)."""
+    return len(output) // 4
+
+
+def append_to_history(
+    task_id: str,
+    success: bool,
+    error_type: Optional[str],
+    tokens: int,
+    duration_s: float,
+    log_file: str,
+    timestamp: Optional[str] = None,
+) -> None:
+    """
+    Append minimal 6-field entry to history.jsonl for feedback loop.
+
+    This is separate from index.jsonl - history.jsonl is specifically
+    designed for self-improvement analysis with minimal fields:
+    - task_id, success, error_type, tokens, duration_s, log_file
+    """
+    ensure_logs_dir()
+    history_path = LOGS_DIR / "history.jsonl"
+
+    entry = {
+        "task_id": task_id,
+        "success": success,
+        "error_type": error_type,
+        "tokens": tokens,
+        "duration_s": round(duration_s, 2),
+        "log_file": log_file,
+        "timestamp": timestamp or datetime.now().isoformat(),
+    }
+
+    with open(history_path, "a") as f:
+        f.write(json.dumps(entry) + "\n")
+
+
+def get_history_stats(n: int = 100) -> dict:
+    """Get feedback loop statistics from history.jsonl."""
+    history_path = LOGS_DIR / "history.jsonl"
+    if not history_path.exists():
+        return {"total": 0, "success_rate": 0, "avg_tokens": 0, "avg_duration": 0, "error_types": {}}
+
+    entries = []
+    with open(history_path) as f:
+        for line in f:
+            if line.strip():
+                entries.append(json.loads(line))
+
+    entries = entries[-n:]  # Last n entries
+    if not entries:
+        return {"total": 0, "success_rate": 0, "avg_tokens": 0, "avg_duration": 0, "error_types": {}}
+
+    total = len(entries)
+    successes = sum(1 for e in entries if e.get("success"))
+    tokens = [e.get("tokens", 0) for e in entries]
+    durations = [e.get("duration_s", 0) for e in entries]
+
+    # Count error types
+    error_types = {}
+    for e in entries:
+        et = e.get("error_type")
+        if et:
+            error_types[et] = error_types.get(et, 0) + 1
+
+    return {
+        "total": total,
+        "successes": successes,
+        "failures": total - successes,
+        "success_rate": round(successes / total * 100, 1) if total else 0,
+        "avg_tokens": round(sum(tokens) / len(tokens)) if tokens else 0,
+        "avg_duration": round(sum(durations) / len(durations), 1) if durations else 0,
+        "error_types": error_types,
+    }
+
+
 def get_recent_logs(n: int = 10) -> list[dict]:
     """Read recent log entries from index."""
     index_path = LOGS_DIR / "index.jsonl"

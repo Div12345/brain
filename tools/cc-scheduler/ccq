@@ -38,10 +38,14 @@ os.chdir(SCRIPT_DIR)  # Ensure we're in the right directory for imports
 from lib.capacity import check_capacity, format_capacity, Capacity
 from lib.tasks import load_pending_tasks, Task, TASKS_DIR
 from lib.executor import execute_task, build_prompt
-from lib.logging import log_execution, generate_run_id, format_recent_logs, get_stats
+from lib.log_utils import (
+    log_execution, generate_run_id, format_recent_logs, get_stats,
+    append_to_history, classify_error, estimate_tokens, get_history_stats,
+    LOGS_DIR,
+)
 from lib.budget import BudgetTracker, format_budget_status
 from lib.scheduler import Scheduler, ScheduleConfig, format_schedule_status
-from lib.queue import TaskQueue, ProjectConfig, load_projects_from_config, format_queue_status
+from lib.task_queue import TaskQueue, ProjectConfig, load_projects_from_config, format_queue_status
 
 # Config file
 CONFIG_FILE = SCRIPT_DIR / "config.yaml"
@@ -239,13 +243,17 @@ def cmd_run(args):
 
         # Execute
         run_id = generate_run_id()
+        # Pre-compute log file path for context injection
+        from datetime import datetime as dt
+        log_file_path = str(LOGS_DIR / f"{dt.now().strftime('%Y-%m-%d-%H%M')}-{task.name}.md")
+
         cap_before = {
             "five_hour_percent": cap.five_hour_percent,
             "weekly_percent": cap.weekly_percent
         }
 
         print(f"Executing {task.name}...")
-        result = execute_task(task)
+        result = execute_task(task, run_id=run_id, log_file=log_file_path)
 
         # Check capacity after
         cap_after_obj = check_capacity()
@@ -265,7 +273,7 @@ def cmd_run(args):
             budget.record_usage(task.name, tokens_used, percent_used)
             budget.update_session(task.name, percent_used)
 
-        # Log result
+        # Log result (detailed markdown log)
         log_path = log_execution(
             task_name=task.name,
             run_id=run_id,
@@ -278,6 +286,17 @@ def cmd_run(args):
             capacity_before=cap_before,
             capacity_after=cap_after,
             error=result.error,
+        )
+
+        # Log to history.jsonl for feedback loop (6-field minimal schema)
+        append_to_history(
+            task_id=task.name,
+            success=result.success,
+            error_type=classify_error(result.success, result.error, result.exit_code),
+            tokens=tokens_used if tokens_used else estimate_tokens(result.output),
+            duration_s=result.duration_seconds,
+            log_file=str(log_path),
+            timestamp=result.started_at.isoformat(),
         )
 
         # Report result
@@ -382,6 +401,16 @@ def cmd_logs(args):
     print()
     stats = get_stats()
     print(f"Total: {stats['total']} runs | Success: {stats['success_rate']}% | Avg: {stats['avg_duration']}s")
+
+    # Show feedback loop metrics from history.jsonl
+    h_stats = get_history_stats()
+    if h_stats["total"] > 0:
+        print(f"\nFeedback Loop Metrics (history.jsonl):")
+        print(f"  Success rate: {h_stats['success_rate']}%")
+        print(f"  Avg tokens: {h_stats['avg_tokens']:,}")
+        print(f"  Avg duration: {h_stats['avg_duration']}s")
+        if h_stats["error_types"]:
+            print(f"  Error types: {h_stats['error_types']}")
 
 
 def cmd_add(args):
