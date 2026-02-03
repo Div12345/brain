@@ -114,18 +114,54 @@ def execute_task(task: Task, dry_run: bool = False) -> ExecutionResult:
         cmd.extend(["--allowedTools", "Read,Glob,Grep,WebSearch,WebFetch"])
 
     try:
-        result = subprocess.run(
+        print(f"[{datetime.now().strftime('%H:%M:%S')}] Starting claude process...")
+        
+        # Use Popen to stream output
+        process = subprocess.Popen(
             cmd,
-            capture_output=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,  # Merge stderr into stdout
             text=True,
-            timeout=timeout_secs,
-            cwd=str(Path.home() / "brain"),  # Run from brain repo
+            bufsize=1,  # Line buffered
+            cwd=str(Path.home() / "brain"),
             env={**os.environ, "CLAUDE_CODE_ENTRYPOINT": "ccq-scheduler"}
         )
 
+        captured_output = []
+        
+        # Stream output while checking for timeout
+        start_time = time.time()
+        
+        while True:
+            # Check for timeout
+            if time.time() - start_time > timeout_secs:
+                process.kill()
+                raise subprocess.TimeoutExpired(cmd, timeout_secs, output="".join(captured_output).encode())
+            
+            # Non-blocking read needed? No, readline is blocking but we have timeout loop
+            # Actually, standard readline loop is better, but we need to check timeout.
+            # Using selector or simple blocking read with short lines is usually fine,
+            # but proper way is poll.
+            
+            if process.poll() is not None:
+                # Process finished, read remaining output
+                for line in process.stdout:
+                    print(line, end='', flush=True)
+                    captured_output.append(line)
+                break
+                
+            line = process.stdout.readline()
+            if line:
+                print(line, end='', flush=True)
+                captured_output.append(line)
+            else:
+                # No output, slight sleep to prevent CPU spin
+                time.sleep(0.1)
+
+        result_code = process.returncode
         ended_at = datetime.now()
-        success = result.returncode == 0
-        output = result.stdout + ("\n" + result.stderr if result.stderr else "")
+        success = result_code == 0
+        output = "".join(captured_output)
 
         # Move to completed or failed
         final_status = "completed" if success else "failed"
@@ -135,7 +171,7 @@ def execute_task(task: Task, dry_run: bool = False) -> ExecutionResult:
         return ExecutionResult(
             task_name=task.name,
             success=success,
-            exit_code=result.returncode,
+            exit_code=result_code,
             output=output,
             started_at=started_at,
             ended_at=ended_at,
