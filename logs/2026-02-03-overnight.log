@@ -1,0 +1,21 @@
+﻿2026-02-03 17:31:30 | === Brain Overnight Run Started (SCHEDULED) ===
+2026-02-03 17:31:30 | Lock acquired
+2026-02-03 17:31:30 | Checking capacity...
+2026-02-03 17:31:30 | ERROR: Cannot run a document in the middle of a pipeline: C:\Windows\System32\wsl.exe.
+2026-02-03 17:31:30 | Total runtime: 0.0 minutes
+2026-02-03 17:32:58 | === Brain Overnight Run Started ===
+2026-02-03 17:32:58 | Lock acquired
+2026-02-03 17:32:58 | Checking capacity...
+2026-02-03 17:32:58 | Capacity response: {"limited": true, "five_hour": 100.0, "weekly": 54.0, "resets_at": "2026-02-03T23:00:00.475268+00:00"}
+2026-02-03 17:32:58 | Capacity: 5h=100.0% 7d=54.0% limited=True
+2026-02-03 17:32:58 | Rate limited. Scheduling bounce-back retry.
+2026-02-03 17:32:58 | Would schedule retry at 2026-02-03T23:00:00.475268+00:00 (manual trigger needed on Windows)
+2026-02-03 17:32:58 | Lock released
+2026-02-03 17:33:30 | === Brain Overnight Run Started ===
+2026-02-03 17:33:30 | Lock acquired
+2026-02-03 17:33:30 | Checking capacity...
+2026-02-03 17:33:31 | Capacity response: {"limited": true, "five_hour": 100.0, "weekly": 54.0, "resets_at": "2026-02-03T22:59:59.920965+00:00"}
+2026-02-03 17:33:31 | Capacity: 5h=100.0% 7d=54.0% limited=True
+2026-02-03 17:33:31 | Rate limited. Scheduling bounce-back retry.
+2026-02-03 17:33:31 | Would schedule retry at 2026-02-03T22:59:59.920965+00:00 (manual trigger needed on Windows)
+2026-02-03 17:33:31 | Lock released
