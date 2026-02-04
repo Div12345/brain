@@ -6,12 +6,15 @@ Tools:
   - claude_desktop_send: Send a message and optionally wait for response
   - claude_desktop_read: Get current conversation messages
   - claude_desktop_info: Get conversation ID and metadata
+  - claude_desktop_relaunch: Relaunch Claude Desktop in debug mode
 """
 
 import json
 import time
 import hashlib
 import sys
+import subprocess
+import shutil
 from typing import Any
 
 # MCP imports
@@ -24,6 +27,43 @@ import requests
 import websocket
 
 DEVTOOLS_URL = "http://127.0.0.1:9222"
+CLAUDE_EXE_PATH = r"%LOCALAPPDATA%\AnthropicClaude\claude.exe"
+
+def relaunch_claude_debug():
+    """Kill Claude Desktop and relaunch with debug flags."""
+    PS = "/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe"
+    CLAUDE_PATH = r"C:\Users\din18\AppData\Local\AnthropicClaude\claude.exe"
+
+    try:
+        # Kill existing Claude Desktop process
+        subprocess.run([PS, "-Command", "Stop-Process -Name claude -Force -ErrorAction SilentlyContinue"],
+                      capture_output=True, timeout=10)
+        time.sleep(2)
+
+        # Relaunch with debug flags
+        subprocess.run([PS, "-Command",
+            f'Start-Process -FilePath "{CLAUDE_PATH}" -ArgumentList "--remote-debugging-port=9222","--remote-allow-origins=*"'],
+            capture_output=True, timeout=10)
+
+        # Wait for DevTools to become available
+        for i in range(15):  # 15 attempts, ~15 seconds
+            time.sleep(1)
+            try:
+                response = requests.get(f"{DEVTOOLS_URL}/json", timeout=2)
+                if response.status_code == 200:
+                    targets = response.json()
+                    for target in targets:
+                        if "claude.ai" in target.get("url", ""):
+                            return {"success": True, "message": "Claude Desktop relaunched in debug mode", "attempts": i + 1}
+            except:
+                pass
+
+        return {"success": False, "error": "DevTools not available after relaunch - Claude may still be starting"}
+
+    except subprocess.TimeoutExpired:
+        return {"success": False, "error": "Command timed out"}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
 
 def get_claude_ws():
     """Connect to Claude Desktop via DevTools."""
@@ -257,16 +297,26 @@ async def list_tools() -> list[Tool]:
                 },
                 "required": ["query"]
             }
+        ),
+        Tool(
+            name="claude_desktop_relaunch",
+            description="Kill and relaunch Claude Desktop with debug flags enabled (--remote-debugging-port=9222). Use this when other tools return connection errors.",
+            inputSchema={"type": "object", "properties": {}}
         )
     ]
 
 @server.call_tool()
 async def call_tool(name: str, arguments: dict[str, Any]) -> list[TextContent]:
+    # Handle relaunch separately - doesn't need existing connection
+    if name == "claude_desktop_relaunch":
+        result = relaunch_claude_debug()
+        return [TextContent(type="text", text=json.dumps(result))]
+
     ws = get_claude_ws()
     if not ws:
         return [TextContent(
             type="text",
-            text=json.dumps({"error": "Cannot connect to Claude Desktop. Launch with --remote-debugging-port=9222 --remote-allow-origins=*"})
+            text=json.dumps({"error": "Cannot connect to Claude Desktop. Launch with --remote-debugging-port=9222 --remote-allow-origins=* (or use claude_desktop_relaunch)"})
         )]
 
     try:
