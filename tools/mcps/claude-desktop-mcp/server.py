@@ -27,26 +27,9 @@ import requests
 import websocket
 
 def get_inspect_url():
-    """Get the inspect URL, handling WSL -> Windows connection."""
-    import os
-    import platform
-
-    host = "127.0.0.1"
-
-    # Check if running in WSL
-    if platform.system() == "Linux" and "microsoft" in platform.release().lower():
-        # WSL2: Get Windows host IP from /etc/resolv.conf
-        try:
-            with open("/etc/resolv.conf", "r") as f:
-                for line in f:
-                    if line.startswith("nameserver"):
-                        host = line.split()[1]
-                        break
-        except:
-            # Fallback: try common WSL host
-            host = "172.17.0.1"
-
-    return f"http://{host}:9229"
+    """Get the inspect URL - localhost works for both native and WSL."""
+    # WSL can reach Windows localhost:9229 directly, no need for host IP
+    return "http://127.0.0.1:9229"
 
 INSPECT_URL = get_inspect_url()
 
