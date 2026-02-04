@@ -19,3 +19,61 @@
 2026-02-03 17:33:31 | Rate limited. Scheduling bounce-back retry.
 2026-02-03 17:33:31 | Would schedule retry at 2026-02-03T22:59:59.920965+00:00 (manual trigger needed on Windows)
 2026-02-03 17:33:31 | Lock released
+2026-02-03 18:02:01 | === Brain Overnight Run Started ===
+2026-02-03 18:02:01 | Lock acquired
+2026-02-03 18:02:01 | Checking capacity...
+2026-02-03 18:02:01 | Capacity response: {"limited": false, "five_hour": 0.0, "weekly": 54.0, "resets_at": null}
+2026-02-03 18:02:01 | Capacity: 5h=0.0% 7d=54.0% limited=False
+2026-02-03 18:02:01 | Capacity available. Running ccq...
+Capacity: ✓ Available | 5h: 0% | 7d: 54%
+Available: ~230,000 tokens
+Phase: buffer
+
+Tasks to run: 1
+
+--- scheduler-smoke-test ---
+Executing scheduler-smoke-test...
+[18:02:02] Starting claude process...
+Task completed successfully. The scheduler smoke test has been verified:
+
+- **Verification file created:** `logs/scheduler-verified-2026-02-04.md`
+- **Timestamp:** 2026-02-03 18:02:18 EST
+- **Session state read:** Yes (confirmed access to context/session-state.md)
+- **Working directory:** /home/div/brain
+
+The cc-scheduler executed and completed the smoke test task. The pending task from the session restore has been addressed.
+✓ Completed in 30.2s
+Tokens used: ~5,000
+Log: /home/div/brain/logs/scheduler/2026-02-03-1802-scheduler-smoke-test.md
+
+2026-02-03 18:02:32 | ccq run completed
+2026-02-03 18:02:32 | Committing changes...
+2026-02-03 18:02:33 | Lock released
+2026-02-03 18:39:42 | === Brain Overnight Run Started ===
+2026-02-03 18:39:42 | Lock acquired
+2026-02-03 18:39:42 | Checking capacity...
+2026-02-03 18:39:42 | Capacity response: {"limited": false, "five_hour": 1.0, "weekly": 54.0, "resets_at": "2026-02-04T04:00:00.465267+00:00"}
+2026-02-03 18:39:42 | Capacity: 5h=1.0% 7d=54.0% limited=False
+2026-02-03 18:39:42 | Capacity available. Running ccq...
+Capacity: ✓ Available | 5h: 1% | 7d: 54%
+Available: ~230,000 tokens
+Phase: buffer
+
+Error parsing /home/div/brain/tasks/pending/045-scheduler-setup-skill.md: Invalid skill: refactor. Valid: [None, 'autopilot', 'ralph', 'ultrawork', 'ecomode', 'plan', 'analyze', 'deepsearch', 'tdd']
+No tasks fit in available capacity (230,000 tokens)
+2026-02-03 18:39:42 | ccq run completed
+2026-02-03 18:39:42 | Committing changes...
+2026-02-03 18:39:43 | Lock released
+2026-02-03 18:39:55 | === Brain Overnight Run Started ===
+2026-02-03 18:39:55 | Lock acquired
+2026-02-03 18:39:55 | Checking capacity...
+2026-02-03 18:39:56 | Capacity response: {"limited": false, "five_hour": 1.0, "weekly": 54.0, "resets_at": "2026-02-04T04:00:00.208807+00:00"}
+2026-02-03 18:39:56 | Capacity: 5h=1.0% 7d=54.0% limited=False
+2026-02-03 18:39:56 | Capacity available. Running ccq...
+Capacity: ✓ Available | 5h: 1% | 7d: 54%
+Available: ~230,000 tokens
+Phase: buffer
+
+No tasks selected for this session (budget constraints).
+2026-02-03 18:39:56 | ccq run completed
+2026-02-03 18:39:56 | Committing changes...

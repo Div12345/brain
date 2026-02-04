@@ -12,7 +12,7 @@
     },
     "2026-02-03": {
       "planned_percent": 15.0,
-      "actual_percent": 2.0,
+      "actual_percent": 3.0,
       "tasks_planned": [],
       "tasks_completed": [
         {
@@ -32,6 +32,12 @@
           "tokens": 5000,
           "percent": 1.0,
           "timestamp": "2026-02-03T15:11:24.120696"
+        },
+        {
+          "name": "scheduler-smoke-test",
+          "tokens": 5000,
+          "percent": 1.0,
+          "timestamp": "2026-02-03T18:02:32.806053"
         }
       ]
     },

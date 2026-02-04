@@ -10,5 +10,9 @@
   "verify": {
     "avg_tokens": 5000,
     "samples": 1
+  },
+  "scheduler": {
+    "avg_tokens": 5000,
+    "samples": 1
   }
 }

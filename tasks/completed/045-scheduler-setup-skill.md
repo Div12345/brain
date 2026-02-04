@@ -5,7 +5,7 @@ priority: 3
 estimated_tokens: 10000
 mode: autonomous
 timeout: 15m
-skill: refactor
+skill: analyze
 model_hint: sonnet
 tags: [infrastructure, skill]
 depends_on: []

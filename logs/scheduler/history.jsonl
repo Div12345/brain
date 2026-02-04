@@ -1,1 +1,2 @@
 {"task_id": "verify-tiny", "success": true, "error_type": null, "tokens": 5000, "duration_s": 35.49, "log_file": "/home/div/brain/logs/scheduler/2026-02-03-1510-verify-tiny.md", "timestamp": "2026-02-03T15:10:48.322225"}
+{"task_id": "scheduler-smoke-test", "success": true, "error_type": null, "tokens": 5000, "duration_s": 30.2, "log_file": "/home/div/brain/logs/scheduler/2026-02-03-1802-scheduler-smoke-test.md", "timestamp": "2026-02-03T18:02:02.377443"}
