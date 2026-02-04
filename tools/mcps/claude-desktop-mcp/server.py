@@ -2,19 +2,20 @@
 """
 Claude Desktop MCP Server - Control Claude Desktop from any agent.
 
+Uses the main process debugger (port 9229) to proxy CDP commands to the renderer.
+Requires: Enable "Main Process Debugger" in Claude Desktop settings.
+
 Tools:
   - claude_desktop_send: Send a message and optionally wait for response
   - claude_desktop_read: Get current conversation messages
   - claude_desktop_info: Get conversation ID and metadata
-  - claude_desktop_relaunch: Relaunch Claude Desktop in debug mode
 """
 
 import json
 import time
 import hashlib
-import sys
 import subprocess
-import shutil
+import sys
 from typing import Any
 
 # MCP imports
@@ -22,56 +23,69 @@ from mcp.server import Server
 from mcp.server.stdio import stdio_server
 from mcp.types import Tool, TextContent
 
-# DevTools connection (reuse existing logic)
 import requests
 import websocket
 
-DEVTOOLS_URL = "http://127.0.0.1:9222"
-CLAUDE_EXE_PATH = r"%LOCALAPPDATA%\AnthropicClaude\claude.exe"
+def get_inspect_url():
+    """Get the inspect URL, handling WSL -> Windows connection."""
+    import os
+    import platform
 
-def relaunch_claude_debug():
-    """Kill Claude Desktop and relaunch with debug flags."""
-    PS = "/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe"
-    CLAUDE_PATH = r"C:\Users\din18\AppData\Local\AnthropicClaude\claude.exe"
+    host = "127.0.0.1"
 
+    # Check if running in WSL
+    if platform.system() == "Linux" and "microsoft" in platform.release().lower():
+        # WSL2: Get Windows host IP from /etc/resolv.conf
+        try:
+            with open("/etc/resolv.conf", "r") as f:
+                for line in f:
+                    if line.startswith("nameserver"):
+                        host = line.split()[1]
+                        break
+        except:
+            # Fallback: try common WSL host
+            host = "172.17.0.1"
+
+    return f"http://{host}:9229"
+
+INSPECT_URL = get_inspect_url()
+
+def get_claude_desktop_exe():
+    """Find the latest Claude Desktop executable dynamically."""
+    import os
+    import platform
+
+    if platform.system() == "Windows":
+        base_path = os.path.expandvars(r"%LOCALAPPDATA%\AnthropicClaude")
+        if os.path.exists(base_path):
+            # Find all app-* directories and get the latest one
+            app_dirs = [d for d in os.listdir(base_path) if d.startswith("app-")]
+            if app_dirs:
+                # Sort by version number (app-1.1.1890 -> 1.1.1890)
+                app_dirs.sort(key=lambda x: [int(n) for n in x.replace("app-", "").split(".")], reverse=True)
+                latest = app_dirs[0]
+                exe_path = os.path.join(base_path, latest, "claude.exe")
+                if os.path.exists(exe_path):
+                    return exe_path
+        # Fallback to Squirrel launcher
+        launcher = os.path.join(base_path, "claude.exe")
+        if os.path.exists(launcher):
+            return launcher
+    else:
+        # Linux/Mac paths
+        for path in ["/usr/bin/claude", "/Applications/Claude.app/Contents/MacOS/Claude"]:
+            if os.path.exists(path):
+                return path
+
+    return None
+
+def get_main_process_ws():
+    """Connect to Claude Desktop main process via Node inspector."""
     try:
-        # Kill existing Claude Desktop process
-        subprocess.run([PS, "-Command", "Stop-Process -Name claude -Force -ErrorAction SilentlyContinue"],
-                      capture_output=True, timeout=10)
-        time.sleep(2)
-
-        # Relaunch with debug flags
-        subprocess.run([PS, "-Command",
-            f'Start-Process -FilePath "{CLAUDE_PATH}" -ArgumentList "--remote-debugging-port=9222","--remote-allow-origins=*"'],
-            capture_output=True, timeout=10)
-
-        # Wait for DevTools to become available
-        for i in range(15):  # 15 attempts, ~15 seconds
-            time.sleep(1)
-            try:
-                response = requests.get(f"{DEVTOOLS_URL}/json", timeout=2)
-                if response.status_code == 200:
-                    targets = response.json()
-                    for target in targets:
-                        if "claude.ai" in target.get("url", ""):
-                            return {"success": True, "message": "Claude Desktop relaunched in debug mode", "attempts": i + 1}
-            except:
-                pass
-
-        return {"success": False, "error": "DevTools not available after relaunch - Claude may still be starting"}
-
-    except subprocess.TimeoutExpired:
-        return {"success": False, "error": "Command timed out"}
-    except Exception as e:
-        return {"success": False, "error": str(e)}
-
-def get_claude_ws():
-    """Connect to Claude Desktop via DevTools."""
-    try:
-        response = requests.get(f"{DEVTOOLS_URL}/json", timeout=5)
+        response = requests.get(f"{INSPECT_URL}/json", timeout=5)
         targets = response.json()
         for target in targets:
-            if "claude.ai" in target.get("url", "") and target.get("type") == "page":
+            if target.get("type") == "node":
                 ws_url = target.get("webSocketDebuggerUrl")
                 if ws_url:
                     return websocket.create_connection(ws_url, timeout=10)
@@ -79,8 +93,8 @@ def get_claude_ws():
         return None
     return None
 
-def send_cdp(ws, method, params=None, cmd_id=1):
-    """Send CDP command."""
+def send_inspector_cmd(ws, method, params=None, cmd_id=1):
+    """Send command to Node inspector."""
     cmd = {"id": cmd_id, "method": method}
     if params:
         cmd["params"] = params
@@ -90,13 +104,89 @@ def send_cdp(ws, method, params=None, cmd_id=1):
         if resp.get("id") == cmd_id:
             return resp
 
-def eval_js(ws, expression, cmd_id=1):
-    """Evaluate JS in page."""
-    result = send_cdp(ws, "Runtime.evaluate", {
+def eval_in_main(ws, expression, cmd_id=1):
+    """Evaluate JS in main process."""
+    result = send_inspector_cmd(ws, "Runtime.evaluate", {
         "expression": expression,
         "returnByValue": True
     }, cmd_id)
     return result.get("result", {}).get("result", {}).get("value")
+
+def ensure_debugger_attached(ws):
+    """Ensure debugger is attached to the claude.ai renderer."""
+    js = """
+    (function() {
+        try {
+            const electron = process.mainModule ? process.mainModule.require("electron") : global.require("electron");
+            const { webContents } = electron;
+            const all = webContents.getAllWebContents();
+
+            // Find the claude.ai webContents
+            const claudeWc = all.find(wc => wc.getURL().includes("claude.ai"));
+            if (!claudeWc) return { error: "No claude.ai webContents found. Make sure you're logged in." };
+
+            if (!claudeWc.debugger.isAttached()) {
+                claudeWc.debugger.attach("1.3");
+            }
+            return { attached: true, url: claudeWc.getURL() };
+        } catch(e) {
+            return { error: e.message };
+        }
+    })()
+    """
+    result = eval_in_main(ws, js)
+    return result
+
+def eval_in_renderer(ws, expression, cmd_id=1):
+    """Evaluate JS in renderer via main process proxy.
+
+    Targets the webContents that has claude.ai URL (not the wrapper window).
+    """
+    # Escape the expression for embedding in JS string
+    escaped_expr = json.dumps(expression)
+
+    js = f"""
+    (async function() {{
+        try {{
+            const electron = process.mainModule ? process.mainModule.require("electron") : global.require("electron");
+            const {{ webContents }} = electron;
+            const all = webContents.getAllWebContents();
+
+            // Find the claude.ai webContents (not the wrapper)
+            const claudeWc = all.find(wc => wc.getURL().includes("claude.ai"));
+            if (!claudeWc) return JSON.stringify({{ error: "No claude.ai webContents found" }});
+
+            if (!claudeWc.debugger.isAttached()) {{
+                claudeWc.debugger.attach("1.3");
+            }}
+
+            const result = await claudeWc.debugger.sendCommand("Runtime.evaluate", {{
+                expression: {escaped_expr},
+                returnByValue: true
+            }});
+
+            return JSON.stringify(result);
+        }} catch(e) {{
+            return JSON.stringify({{ error: e.message }});
+        }}
+    }})()
+    """
+
+    # Use awaitPromise since we're using async
+    result = send_inspector_cmd(ws, "Runtime.evaluate", {
+        "expression": js,
+        "returnByValue": True,
+        "awaitPromise": True
+    }, cmd_id)
+
+    value = result.get("result", {}).get("result", {}).get("value")
+    if value:
+        try:
+            parsed = json.loads(value)
+            return parsed.get("result", {}).get("value")
+        except:
+            return value
+    return None
 
 def get_conversations(ws):
     """Get list of conversations from sidebar."""
@@ -115,21 +205,24 @@ def get_conversations(ws):
         return JSON.stringify(convos);
     })()
     """
-    result = eval_js(ws, js)
-    return json.loads(result) if result else []
+    result = eval_in_renderer(ws, js)
+    try:
+        return json.loads(result) if result else []
+    except:
+        return []
 
 def navigate_to_chat(ws, chat_id):
     """Navigate to a specific conversation."""
     url = f"https://claude.ai/chat/{chat_id}"
     js = f"window.location.href = '{url}'"
-    eval_js(ws, js)
-    time.sleep(2)  # Wait for navigation
+    eval_in_renderer(ws, js)
+    time.sleep(2)
     return {"success": True, "navigated_to": url}
 
 def create_new_chat(ws):
     """Create a new conversation."""
     js = "window.location.href = 'https://claude.ai/new'"
-    eval_js(ws, js)
+    eval_in_renderer(ws, js)
     time.sleep(1)
     return {"success": True, "url": "https://claude.ai/new"}
 
@@ -160,38 +253,32 @@ def get_messages(ws):
         return JSON.stringify(messages);
     })()
     """
-    result = eval_js(ws, js)
-    return json.loads(result) if result else []
+    result = eval_in_renderer(ws, js)
+    try:
+        return json.loads(result) if result else []
+    except:
+        return []
 
 def send_message(ws, message):
     """Send a message via ProseMirror contenteditable."""
-    # Escape message for JS string
     escaped = json.dumps(message)
 
-    # Target ProseMirror editor (not textarea - that's just for accessibility)
     js_input = f"""
     (function() {{
         const pm = document.querySelector('.ProseMirror');
         if (!pm) return 'no-prosemirror';
-
-        // Focus the editor
         pm.focus();
-
-        // Set content via innerHTML (works with contenteditable)
         pm.innerHTML = '<p>' + {escaped} + '</p>';
-
-        // Dispatch input event so React/tiptap picks up the change
         pm.dispatchEvent(new InputEvent('input', {{
             bubbles: true,
             cancelable: true,
             inputType: 'insertText',
             data: {escaped}
         }}));
-
         return 'text-set';
     }})()
     """
-    result = eval_js(ws, js_input, 5)
+    result = eval_in_renderer(ws, js_input, 5)
     if result != 'text-set':
         return {"success": False, "error": f"Input failed: {result}"}
 
@@ -206,7 +293,7 @@ def send_message(ws, message):
         return 'sent';
     })()
     """
-    result = eval_js(ws, js_send, 6)
+    result = eval_in_renderer(ws, js_send, 6)
     return {"success": result == 'sent', "error": None if result == 'sent' else result}
 
 def wait_for_response(ws, timeout=120, poll_interval=2):
@@ -221,7 +308,6 @@ def wait_for_response(ws, timeout=120, poll_interval=2):
 
         if current_hash == last_hash:
             stable_count += 1
-            # Response stable for 2 polls = done
             if stable_count >= 2 and messages and messages[-1].get('role') == 'assistant':
                 return messages[-1].get('text', '')
         else:
@@ -230,7 +316,58 @@ def wait_for_response(ws, timeout=120, poll_interval=2):
 
         time.sleep(poll_interval)
 
-    return None  # Timeout
+    return None
+
+def relaunch_desktop(timeout=30):
+    """Kill and relaunch Claude Desktop, wait for debugger to be available."""
+    import platform
+    import os
+
+    exe_path = get_claude_desktop_exe()
+    if not exe_path:
+        return {
+            "success": False,
+            "error": "Could not find Claude Desktop executable"
+        }
+
+    # Kill Claude Desktop processes (not Claude Code)
+    if platform.system() == "Windows":
+        # Kill only AnthropicClaude processes, not .local/bin/claude.exe (Claude Code)
+        kill_cmd = '''powershell -Command "Get-Process -Name claude -ErrorAction SilentlyContinue | Where-Object { $_.Path -like '*AnthropicClaude*' } | Stop-Process -Force"'''
+        subprocess.run(kill_cmd, shell=True, capture_output=True)
+    else:
+        # Linux/Mac - kill by path pattern
+        subprocess.run("pkill -f 'AnthropicClaude'", shell=True, capture_output=True)
+
+    time.sleep(2)
+
+    # Launch Claude Desktop
+    if platform.system() == "Windows":
+        subprocess.Popen(
+            [exe_path],
+            creationflags=subprocess.DETACHED_PROCESS | subprocess.CREATE_NEW_PROCESS_GROUP
+        )
+    else:
+        subprocess.Popen([exe_path], start_new_session=True)
+
+    # Poll for debugger availability
+    start = time.time()
+    while time.time() - start < timeout:
+        try:
+            response = requests.get(f"{INSPECT_URL}/json", timeout=2)
+            if response.status_code == 200:
+                return {
+                    "success": True,
+                    "message": "Claude Desktop relaunched and debugger is available"
+                }
+        except:
+            pass
+        time.sleep(1)
+
+    return {
+        "success": False,
+        "error": "Claude Desktop relaunched but debugger not available. Please enable 'Main Process Debugger' in Claude Desktop: Menu > Help > Enable Main Process Debugger"
+    }
 
 # MCP Server Setup
 server = Server("claude-desktop")
@@ -300,8 +437,13 @@ async def list_tools() -> list[Tool]:
         ),
         Tool(
             name="claude_desktop_relaunch",
-            description="Kill and relaunch Claude Desktop with debug flags enabled (--remote-debugging-port=9222). Use this when other tools return connection errors.",
-            inputSchema={"type": "object", "properties": {}}
+            description="Restart Claude Desktop. After relaunch, user may need to re-enable 'Main Process Debugger' in Help menu if debugger doesn't auto-connect.",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "timeout": {"type": "integer", "description": "Max seconds to wait for debugger", "default": 30}
+                }
+            }
         )
     ]
 
@@ -309,17 +451,23 @@ async def list_tools() -> list[Tool]:
 async def call_tool(name: str, arguments: dict[str, Any]) -> list[TextContent]:
     # Handle relaunch separately - doesn't need existing connection
     if name == "claude_desktop_relaunch":
-        result = relaunch_claude_debug()
+        timeout = arguments.get("timeout", 30)
+        result = relaunch_desktop(timeout)
         return [TextContent(type="text", text=json.dumps(result))]
 
-    ws = get_claude_ws()
+    ws = get_main_process_ws()
     if not ws:
         return [TextContent(
             type="text",
-            text=json.dumps({"error": "Cannot connect to Claude Desktop. Launch with --remote-debugging-port=9222 --remote-allow-origins=* (or use claude_desktop_relaunch)"})
+            text=json.dumps({"error": "Cannot connect to Claude Desktop. Enable 'Main Process Debugger' in Claude Desktop settings."})
         )]
 
     try:
+        # Ensure debugger is attached
+        attach_result = ensure_debugger_attached(ws)
+        if isinstance(attach_result, dict) and attach_result.get("error"):
+            return [TextContent(type="text", text=json.dumps(attach_result))]
+
         if name == "claude_desktop_send":
             message = arguments.get("message", "")
             wait = arguments.get("wait_for_response", True)
@@ -353,11 +501,11 @@ async def call_tool(name: str, arguments: dict[str, Any]) -> list[TextContent]:
             }))]
 
         elif name == "claude_desktop_info":
-            url = eval_js(ws, "window.location.href", 1)
-            title = eval_js(ws, "document.title", 2)
+            url = eval_in_renderer(ws, "window.location.href", 1)
+            title = eval_in_renderer(ws, "document.title", 2)
             conv_id = None
-            if url and '/chat/' in url:
-                conv_id = url.split('/chat/')[-1].split('?')[0]
+            if url and '/chat/' in str(url):
+                conv_id = str(url).split('/chat/')[-1].split('?')[0]
             return [TextContent(type="text", text=json.dumps({
                 "url": url,
                 "conversation_id": conv_id,
