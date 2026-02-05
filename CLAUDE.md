@@ -80,14 +80,11 @@ echo "..." > messages/outbox/MSG-<timestamp>-<from>-<to>.md
 
 This repo follows the compound engineering methodology: each task should make the next task easier.
 
-### Skills Available
-- **`/compound-capture`** — After resolving a problem, captures knowledge to `knowledge/solutions/`
-- **`/learnings-query`** — Before planning, checks past solutions to prevent re-research
-
-### Key Artifacts
-- `knowledge/frameworks/capability-registry.md` — All capabilities mapped to loop steps
-- `knowledge/frameworks/compound-engineering-evaluation.md` — Framework for evaluating new tools
-- `knowledge/solutions/` — Accumulated solution docs (compound capture output)
+### Key Directories
+- `docs/plans/` — CE plan files (persistent across sessions)
+- `docs/brainstorms/` — CE brainstorm files
+- `docs/solutions/` — CE compound output (categorized learnings)
+- `knowledge/frameworks/` — Capability registry and evaluation framework (read on demand)
 
 ### The Loop
 1. **Plan** — Query past solutions → research codebase → research external → structure plan
