@@ -13,7 +13,6 @@ Tools:
 
 import json
 import time
-import hashlib
 import subprocess
 import sys
 from typing import Any
@@ -246,12 +245,17 @@ def send_message(ws, message):
     """Send a message via ProseMirror contenteditable."""
     escaped = json.dumps(message)
 
+    # Use textContent to avoid HTML injection — escaped is already JSON-safe
     js_input = f"""
     (function() {{
         const pm = document.querySelector('.ProseMirror');
         if (!pm) return 'no-prosemirror';
         pm.focus();
-        pm.innerHTML = '<p>' + {escaped} + '</p>';
+        // Create a text node inside a paragraph to avoid HTML interpretation
+        const p = document.createElement('p');
+        p.textContent = {escaped};
+        pm.innerHTML = '';
+        pm.appendChild(p);
         pm.dispatchEvent(new InputEvent('input', {{
             bubbles: true,
             cancelable: true,
@@ -279,27 +283,383 @@ def send_message(ws, message):
     result = eval_in_renderer(ws, js_send, 6)
     return {"success": result == 'sent', "error": None if result == 'sent' else result}
 
+def is_generating(ws):
+    """Check if Desktop is currently generating a response.
+
+    Uses the stop button as the definitive signal:
+    - Present → generating
+    - Absent → idle/done
+    """
+    js = """
+    (function() {
+        const stopBtn = document.querySelector('button[aria-label="Stop response"]');
+        return stopBtn !== null;
+    })()
+    """
+    result = eval_in_renderer(ws, js, 99)
+    return result is True or result == 'true' or result == True
+
+def get_status(ws):
+    """Get current Desktop status — lightweight, no side effects."""
+    js = """
+    (function() {
+        const stopBtn = document.querySelector('button[aria-label="Stop response"]');
+        const sendBtn = document.querySelector('button[aria-label="Send message"]');
+        const modelEl = document.querySelector('[data-testid="model-selector-dropdown"]');
+
+        // Count messages
+        const userMsgs = document.querySelectorAll('[data-testid="user-message"]');
+        const allMsgBlocks = document.querySelectorAll('[data-testid="user-message"], [data-testid="chat-message-text"]');
+
+        return JSON.stringify({
+            is_generating: stopBtn !== null,
+            send_button: sendBtn ? (sendBtn.disabled ? 'disabled' : 'enabled') : 'absent',
+            model: modelEl ? modelEl.innerText.trim() : null,
+            message_count: allMsgBlocks.length,
+            url: window.location.href
+        });
+    })()
+    """
+    result = eval_in_renderer(ws, js, 98)
+    try:
+        return json.loads(result) if result else {}
+    except:
+        return {"error": str(result)}
+
+def stop_generation(ws):
+    """Click the stop button to halt generation."""
+    js = """
+    (function() {
+        try {
+            const stopBtn = document.querySelector('button[aria-label="Stop response"]');
+            if (!stopBtn) return 'not-generating';
+            stopBtn.click();
+            return 'stopped';
+        } catch(e) {
+            return 'error: ' + e.message;
+        }
+    })()
+    """
+    result = eval_in_renderer(ws, js, 97)
+    return {"success": result == 'stopped', "result": result}
+
+def read_interim(ws):
+    """Read the last assistant message even if generation is ongoing."""
+    js = """
+    (function() {
+        const stopBtn = document.querySelector('button[aria-label="Stop response"]');
+        const isGenerating = stopBtn !== null;
+
+        // Get all chat message text blocks
+        const msgBlocks = document.querySelectorAll('[data-testid="chat-message-text"]');
+        if (msgBlocks.length === 0) {
+            // Fallback to container-based detection
+            const container = document.querySelector('main');
+            if (!container) return JSON.stringify({text: null, is_complete: !isGenerating, char_count: 0});
+        }
+
+        // Last message block is the most recent assistant response
+        const lastBlock = msgBlocks[msgBlocks.length - 1];
+        const text = lastBlock ? lastBlock.innerText.trim() : '';
+
+        return JSON.stringify({
+            text: text.substring(0, 10000),
+            is_complete: !isGenerating,
+            char_count: text.length
+        });
+    })()
+    """
+    result = eval_in_renderer(ws, js, 96)
+    try:
+        return json.loads(result) if result else {"text": None, "is_complete": True, "char_count": 0}
+    except:
+        return {"text": str(result), "is_complete": True, "char_count": len(str(result))}
+
 def wait_for_response(ws, timeout=120, poll_interval=2):
-    """Wait for Claude to finish responding."""
+    """Wait for Claude to finish responding using stop-button detection.
+
+    Uses debounce: requires stop button absent for 2 consecutive polls
+    to avoid false positives from UI flicker.
+    """
     start = time.time()
-    last_hash = None
-    stable_count = 0
+    seen_generating = False
+    absent_count = 0  # debounce: consecutive polls with no stop button
 
     while time.time() - start < timeout:
-        messages = get_messages(ws)
-        current_hash = hashlib.md5(json.dumps(messages).encode()).hexdigest()
+        generating = is_generating(ws)
 
-        if current_hash == last_hash:
-            stable_count += 1
-            if stable_count >= 2 and messages and messages[-1].get('role') == 'assistant':
+        if generating:
+            seen_generating = True
+            absent_count = 0
+        elif seen_generating:
+            absent_count += 1
+            if absent_count >= 2:
+                # Stop button absent for 2 consecutive polls — response is complete
+                time.sleep(0.5)  # brief settle time for DOM update
+                messages = get_messages(ws)
+                if messages and messages[-1].get('role') == 'assistant':
+                    return messages[-1].get('text', '')
+                return None
+
+        # If we haven't seen generating yet, check if there's already a new assistant message
+        if not seen_generating and time.time() - start > 5:
+            messages = get_messages(ws)
+            if messages and messages[-1].get('role') == 'assistant':
+                # Response appeared without us catching the generating state
+                # (very fast response or we missed it)
                 return messages[-1].get('text', '')
-        else:
-            stable_count = 0
-            last_hash = current_hash
 
         time.sleep(poll_interval)
 
     return None
+
+def list_connectors(ws):
+    """List all MCP connectors and their enabled state."""
+    # Open the Toggle menu
+    js_open = """
+    (function() {
+        // Try multiple selectors for the main menu/settings button
+        let btn = document.querySelector('button[aria-label*="menu"], button[aria-label*="settings"], button[aria-label*="options"]');
+        if (!btn) {
+            // Fallback: look for a common settings icon
+            btn = document.querySelector('button svg[aria-label*="settings"]'); // Assuming settings icon has an aria-label
+        }
+        if (!btn) {
+            // Fallback: look for a button with text "Settings" or "Menu"
+            btn = [...document.querySelectorAll('button')].find(b =>
+                b.textContent?.trim().toLowerCase().includes('menu') ||
+                b.textContent?.trim().toLowerCase().includes('settings')
+            );
+        }
+        if (!btn) return JSON.stringify({error: 'no-menu-button-found', detail: 'Could not find a generic menu or settings button.'});
+
+        btn.click();
+        return JSON.stringify({step: 'menu-opened', selector_used: btn.tagName + (btn.id ? '#'+btn.id : '') + (btn.className ? '.'+btn.className.split(' ').join('.') : '') + (btn.getAttribute('aria-label') ? '[aria-label="'+btn.getAttribute('aria-label')+'"]' : '')});
+    })()
+    """
+    open_result = eval_in_renderer(ws, js_open, 90)
+    open_json = json.loads(open_result) if open_result else {}
+    if open_json.get('error'):
+        return {"error": open_json['error'], "detail": open_json.get('detail')}
+    time.sleep(0.3)
+
+    # Click Connectors
+    js_connectors = """
+    (function() {
+        // Try multiple selectors for the "Connectors" menu item
+        let connectorsItem = [...document.querySelectorAll('[role="menuitem"], button, a, div, span')]
+            .find(item => item.textContent?.trim() === 'Connectors');
+
+        if (!connectorsItem) {
+            // Fallback: look for a "Connectors" item that might be under a different parent or role
+            connectorsItem = [...document.querySelectorAll('[data-testid*="connector"], [id*="connector"], [aria-label*="connector"]')]
+                .find(item => item.textContent?.trim().toLowerCase().includes('connectors'));
+        }
+
+        if (!connectorsItem) return JSON.stringify({error: 'no-connectors-item-found', detail: 'Could not find a menu item for "Connectors".'});
+
+        connectorsItem.click();
+        return JSON.stringify({step: 'connectors-clicked', selector_used: connectorsItem.tagName + (connectorsItem.id ? '#'+connectorsItem.id : '') + (connectorsItem.className ? '.'+connectorsItem.className.split(' ').join('.') : '')});
+    })()
+    """
+    connectors_result = eval_in_renderer(ws, js_connectors, 91)
+    connectors_json = json.loads(connectors_result) if connectors_result else {}
+    if connectors_json.get('error'):
+        # Close menu before returning error
+        eval_in_renderer(ws, """document.body.dispatchEvent(new KeyboardEvent('keydown', {key: 'Escape', bubbles: true}))""", 999)
+        return {"error": connectors_json['error'], "detail": connectors_json.get('detail')}
+    time.sleep(0.3)
+
+    # Get all connectors
+    js_list = """
+    (function() {
+        const items = document.querySelectorAll('[role="menuitem"], [data-testid*="connector-item"], [id*="connector-item"]'); // Added data-testid and id hints
+        const connectors = [];
+
+        items.forEach((item, index) => {
+            const switchEl = item.querySelector('[role="switch"], input[type="checkbox"]'); // Added input[type="checkbox"] fallback explicitly
+            if (switchEl) {
+                const rawText = item.textContent?.trim() || '';
+                let cleanName = rawText;
+                // More robust name cleaning (handle "Oobsidian" or just "Obsidian")
+                if (rawText.length > 1 && rawText[0].toUpperCase() === rawText[0] &&
+                    rawText[1].toLowerCase() === rawText[0].toLowerCase()) {
+                    cleanName = rawText.slice(1);
+                }
+                // If still starts with uppercase, convert to lowercase
+                cleanName = cleanName.charAt(0).toLowerCase() + cleanName.slice(1);
+
+                connectors.push({
+                    name: cleanName,
+                    enabled: switchEl.checked === true,
+                    raw_text: rawText,
+                    debug_selector: item.tagName + (item.id ? '#'+item.id : '') + (item.className ? '.'+item.className.split(' ').join('.') : '')
+                });
+            }
+        });
+
+        return JSON.stringify(connectors);
+    })()
+    """
+    result = eval_in_renderer(ws, js_list, 92)
+
+    # Close menu
+    js_close = """document.body.dispatchEvent(new KeyboardEvent('keydown', {key: 'Escape', bubbles: true}))"""
+    eval_in_renderer(ws, js_close, 93)
+
+    try:
+        return json.loads(result) if result else []
+    except:
+        return []
+
+def toggle_connector(ws, connector_name, enable=None):
+    """Toggle an MCP connector on/off.
+
+    Args:
+        connector_name: Name like 'obsidian', 'github', 'memory', etc.
+        enable: True to enable, False to disable, None to toggle
+
+    Returns dict with result.
+    """
+    # Open the Toggle menu
+    js_open = """
+    (function() {
+        // Try multiple selectors for the main menu/settings button
+        let btn = document.querySelector('button[aria-label*="menu"], button[aria-label*="settings"], button[aria-label*="options"]');
+        if (!btn) {
+            // Fallback: look for a common settings icon
+            btn = document.querySelector('button svg[aria-label*="settings"]');
+        }
+        if (!btn) {
+            // Fallback: look for a button with text "Settings" or "Menu"
+            btn = [...document.querySelectorAll('button')].find(b =>
+                b.textContent?.trim().toLowerCase().includes('menu') ||
+                b.textContent?.trim().toLowerCase().includes('settings')
+            );
+        }
+        if (!btn) return JSON.stringify({error: 'no-menu-button-found', detail: 'Could not find a generic menu or settings button.'});
+
+        btn.click();
+        return JSON.stringify({step: 'menu-opened', selector_used: btn.tagName + (btn.id ? '#'+btn.id : '') + (btn.className ? '.'+btn.className.split(' ').join('.') : '') + (btn.getAttribute('aria-label') ? '[aria-label="'+btn.getAttribute('aria-label')+'"]' : '')});
+    })()
+    """
+    open_result = eval_in_renderer(ws, js_open, 80)
+    open_json = json.loads(open_result) if open_result else {}
+    if open_json.get('error'):
+        return {"error": open_json['error'], "detail": open_json.get('detail')}
+    time.sleep(0.3)
+
+    # Click Connectors
+    js_connectors = """
+    (function() {
+        // Try multiple selectors for the "Connectors" menu item
+        let connectorsItem = [...document.querySelectorAll('[role="menuitem"], button, a, div, span')]
+            .find(item => item.textContent?.trim() === 'Connectors');
+
+        if (!connectorsItem) {
+            // Fallback: look for a "Connectors" item that might be under a different parent or role
+            connectorsItem = [...document.querySelectorAll('[data-testid*="connector"], [id*="connector"], [aria-label*="connector"]')]
+                .find(item => item.textContent?.trim().toLowerCase().includes('connectors'));
+        }
+
+        if (!connectorsItem) return JSON.stringify({error: 'no-connectors-item-found', detail: 'Could not find a menu item for "Connectors".'});
+
+        connectorsItem.click();
+        return JSON.stringify({step: 'connectors-clicked', selector_used: connectorsItem.tagName + (connectorsItem.id ? '#'+connectorsItem.id : '') + (connectorsItem.className ? '.'+connectorsItem.className.split(' ').join('.') : '')});
+    })()
+    """
+    connectors_result = eval_in_renderer(ws, js_connectors, 81)
+    connectors_json = json.loads(connectors_result) if connectors_result else {}
+    if connectors_json.get('error'):
+        # Close menu before returning error
+        eval_in_renderer(ws, """document.body.dispatchEvent(new KeyboardEvent('keydown', {key: 'Escape', bubbles: true}))""", 999)
+        return {"error": connectors_json['error'], "detail": connectors_json.get('detail')}
+    time.sleep(0.3)
+
+    # Find and toggle the connector
+    enable_js = 'null' if enable is None else ('true' if enable else 'false')
+    js_toggle = f"""
+    (function() {{
+        const items = document.querySelectorAll('[role="menuitem"], [data-testid*="connector-item"], [id*="connector-item"]'); // Added data-testid and id hints
+        for (const item of items) {{
+            const rawText = item.textContent?.trim() || '';
+            // Check if the raw text contains the connector name (case-insensitive)
+            if (rawText.toLowerCase().includes('{connector_name.lower()}')) {{
+                const input = item.querySelector('[role="switch"], input[type="checkbox"]');
+                if (!input) return JSON.stringify({{error: 'no-checkbox-or-switch-found', detail: 'Could not find toggle for connector.', item_raw_text: rawText}});
+
+                const currentState = input.checked === true;
+                const targetState = {enable_js};
+
+                if (targetState === null || currentState !== targetState) {{
+                    input.click();
+                    return JSON.stringify({{
+                        connector: '{connector_name}',
+                        previousState: currentState,
+                        newState: !currentState,
+                        action: 'toggled',
+                        item_raw_text: rawText
+                    }});
+                }} else {{
+                    return JSON.stringify({{
+                        connector: '{connector_name}',
+                        state: currentState,
+                        action: 'no-change-needed',
+                        item_raw_text: rawText
+                    }});
+                }}
+            }}
+        }}
+        return JSON.stringify({{error: 'connector-not-found', name: '{connector_name}'}});
+    }})()
+    """
+    result = eval_in_renderer(ws, js_toggle, 82)
+    time.sleep(0.3)
+
+    # Close menu
+    js_close = """document.body.dispatchEvent(new KeyboardEvent('keydown', {key: 'Escape', bubbles: true}))"""
+    eval_in_renderer(ws, js_close, 83)
+
+    try:
+        return json.loads(result) if result else {"error": "no result"}
+    except:
+        return {"error": "parse error", "raw": result}
+
+def reload_mcp_config(ws):
+    """Reload MCP configuration via Developer menu."""
+    js = """
+    (function() {
+        try {
+            const electron = process.mainModule ? process.mainModule.require("electron") : global.require("electron");
+            const { Menu } = electron;
+            const menu = Menu.getApplicationMenu();
+            if (!menu) return JSON.stringify({error: "No application menu"});
+
+            const devMenu = menu.items.find(item => item.label === 'Developer');
+            if (!devMenu || !devMenu.submenu) return JSON.stringify({error: "No Developer menu"});
+
+            const reloadItem = devMenu.submenu.items.find(item =>
+                item.label && item.label.includes('Reload MCP')
+            );
+
+            if (!reloadItem) return JSON.stringify({error: "No Reload MCP Configuration menu item"});
+
+            reloadItem.click();
+
+            return JSON.stringify({
+                success: true,
+                message: "MCP Configuration reloaded"
+            });
+        } catch(e) {
+            return JSON.stringify({error: e.message});
+        }
+    })()
+    """
+    result = eval_in_main(ws, js)
+    try:
+        return json.loads(result) if result else {"error": "no result"}
+    except:
+        return {"error": "parse error", "raw": result}
 
 def relaunch_desktop(timeout=30):
     """Kill and relaunch Claude Desktop, wait for debugger to be available."""
@@ -427,6 +787,49 @@ async def list_tools() -> list[Tool]:
                     "timeout": {"type": "integer", "description": "Max seconds to wait for debugger", "default": 30}
                 }
             }
+        ),
+        Tool(
+            name="claude_desktop_status",
+            description="Get Desktop status: is it generating? what model? message count? Lightweight, no side effects.",
+            inputSchema={"type": "object", "properties": {}}
+        ),
+        Tool(
+            name="claude_desktop_stop",
+            description="Stop the current response generation. Only works while Desktop is actively generating.",
+            inputSchema={"type": "object", "properties": {}}
+        ),
+        Tool(
+            name="claude_desktop_read_interim",
+            description="Read the current (possibly incomplete) assistant response. Works during and after generation.",
+            inputSchema={"type": "object", "properties": {}}
+        ),
+        Tool(
+            name="claude_desktop_list_connectors",
+            description="List all MCP connectors configured in Claude Desktop and their enabled/disabled state.",
+            inputSchema={"type": "object", "properties": {}}
+        ),
+        Tool(
+            name="claude_desktop_toggle_connector",
+            description="Enable or disable an MCP connector in Claude Desktop.",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "connector_name": {
+                        "type": "string",
+                        "description": "Name of the connector to toggle (e.g., 'obsidian', 'github', 'memory')"
+                    },
+                    "enable": {
+                        "type": "boolean",
+                        "description": "True to enable, False to disable. Omit to toggle."
+                    }
+                },
+                "required": ["connector_name"]
+            }
+        ),
+        Tool(
+            name="claude_desktop_reload_mcp",
+            description="Reload MCP configuration in Claude Desktop. Use after modifying claude_desktop_config.json to pick up new servers.",
+            inputSchema={"type": "object", "properties": {}}
         )
     ]
 
@@ -489,10 +892,14 @@ async def call_tool(name: str, arguments: dict[str, Any]) -> list[TextContent]:
             conv_id = None
             if url and '/chat/' in str(url):
                 conv_id = str(url).split('/chat/')[-1].split('?')[0]
+            status = get_status(ws)
             return [TextContent(type="text", text=json.dumps({
                 "url": url,
                 "conversation_id": conv_id,
-                "title": title
+                "title": title,
+                "model": status.get("model"),
+                "message_count": status.get("message_count", 0),
+                "is_generating": status.get("is_generating", False)
             }))]
 
         elif name == "claude_desktop_list":
@@ -519,6 +926,35 @@ async def call_tool(name: str, arguments: dict[str, Any]) -> list[TextContent]:
                 "matches": matches,
                 "total": len(matches)
             }))]
+
+        elif name == "claude_desktop_status":
+            status = get_status(ws)
+            return [TextContent(type="text", text=json.dumps(status))]
+
+        elif name == "claude_desktop_stop":
+            result = stop_generation(ws)
+            return [TextContent(type="text", text=json.dumps(result))]
+
+        elif name == "claude_desktop_read_interim":
+            result = read_interim(ws)
+            return [TextContent(type="text", text=json.dumps(result))]
+
+        elif name == "claude_desktop_list_connectors":
+            connectors = list_connectors(ws)
+            return [TextContent(type="text", text=json.dumps({
+                "connectors": connectors,
+                "total": len(connectors)
+            }))]
+
+        elif name == "claude_desktop_toggle_connector":
+            connector_name = arguments.get("connector_name", "")
+            enable = arguments.get("enable")  # None means toggle
+            result = toggle_connector(ws, connector_name, enable)
+            return [TextContent(type="text", text=json.dumps(result))]
+
+        elif name == "claude_desktop_reload_mcp":
+            result = reload_mcp_config(ws)
+            return [TextContent(type="text", text=json.dumps(result))]
 
         else:
             return [TextContent(type="text", text=json.dumps({"error": f"Unknown tool: {name}"}))]
