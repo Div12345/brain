@@ -76,6 +76,25 @@ echo "..." > messages/outbox/MSG-<timestamp>-<from>-<to>.md
 # See [[meta/contribution-workflow]] for details
 ```
 
+## Compound Engineering Loop
+
+This repo follows the compound engineering methodology: each task should make the next task easier.
+
+### Skills Available
+- **`/compound-capture`** — After resolving a problem, captures knowledge to `knowledge/solutions/`
+- **`/learnings-query`** — Before planning, checks past solutions to prevent re-research
+
+### Key Artifacts
+- `knowledge/frameworks/capability-registry.md` — All capabilities mapped to loop steps
+- `knowledge/frameworks/compound-engineering-evaluation.md` — Framework for evaluating new tools
+- `knowledge/solutions/` — Accumulated solution docs (compound capture output)
+
+### The Loop
+1. **Plan** — Query past solutions → research codebase → research external → structure plan
+2. **Work** — Delegate to agents, verify as you go
+3. **Assess** — Multi-perspective review, evidence before claims
+4. **Compound** — Capture learnings, update rules, feed back into next Plan
+
 ## See Also
 - [[meta/contribution-workflow]] - Full PR/contribution guide
 - [[messages/README]] - Inter-agent messaging
