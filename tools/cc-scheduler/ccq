@@ -185,11 +185,22 @@ def cmd_run(args):
 
     # Check capacity
     cap = check_capacity()
+    
+    # Check desktop availability for backend bypass
+    from lib.executor import check_desktop_availability
+    using_desktop = False
+    if args.backend == 'desktop' or args.backend == 'auto':
+        if check_desktop_availability():
+            using_desktop = True
+            # Mock capacity for desktop runs (unlimited)
+            if not cap or (cap.is_limited and args.backend == 'desktop'):
+                cap = Capacity(five_hour_percent=0, weekly_percent=0)
+
     if not cap:
         print("Cannot check capacity. Aborting.")
         return 1
 
-    if cap.is_limited and not args.force:
+    if cap.is_limited and not args.force and not using_desktop:
         print(f"Rate limited: {format_capacity(cap)}")
         print("Waiting for reset before running tasks.")
         return 1
@@ -236,7 +247,9 @@ def cmd_run(args):
 
         if args.dry:
             print(f"[DRY RUN] Would execute: {task.name}")
-            print(f"Mode: {task.mode}, Timeout: {task.timeout}")
+            print(f"Mode: {task.mode}, Backend: {getattr(task, 'backend', 'code')}, Timeout: {task.timeout}")
+            if args.backend:
+                print(f"(Forced backend: {args.backend})")
             print(f"Prompt preview:\n{build_prompt(task)[:300]}...")
             print()
             continue
@@ -253,7 +266,7 @@ def cmd_run(args):
         }
 
         print(f"Executing {task.name}...")
-        result = execute_task(task, run_id=run_id, log_file=log_file_path)
+        result = execute_task(task, run_id=run_id, log_file=log_file_path, force_backend=args.backend)
 
         # Check capacity after
         cap_after_obj = check_capacity()
@@ -453,6 +466,8 @@ def main():
     run_parser.add_argument("--phase", choices=["autonomous", "buffer", "briefing"],
                            help="Override schedule phase")
     run_parser.add_argument("--force", action="store_true", help="Ignore schedule/budget restrictions")
+    run_parser.add_argument("--backend", choices=["code", "desktop", "auto"], default=None,
+                           help="Execution backend (code|desktop|auto)")
 
     # budget
     subparsers.add_parser("budget", help="Show weekly budget status")

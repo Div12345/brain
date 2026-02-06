@@ -97,7 +97,7 @@ Body
         assert task.mcps_required == ["memory", "obsidian"]
 
     def test_validates_skill_values(self):
-        """Invalid skill should raise error."""
+        """Invalid skill should set skill to None."""
         content = '''---
 name: test-task
 priority: 1
@@ -109,11 +109,12 @@ Body
         with tempfile.NamedTemporaryFile(mode='w', suffix='.md', delete=False) as f:
             f.write(content)
             f.flush()
-            with pytest.raises(ValueError, match="[Ii]nvalid skill"):
-                parse_task_file(Path(f.name))
+            task = parse_task_file(Path(f.name))
+
+        assert task.skill is None
 
     def test_validates_model_hint_values(self):
-        """Invalid model_hint should raise error."""
+        """Invalid model_hint should return None."""
         content = '''---
 name: test-task
 priority: 1
@@ -125,5 +126,56 @@ Body
         with tempfile.NamedTemporaryFile(mode='w', suffix='.md', delete=False) as f:
             f.write(content)
             f.flush()
-            with pytest.raises(ValueError, match="[Ii]nvalid model_hint"):
-                parse_task_file(Path(f.name))
+            task = parse_task_file(Path(f.name))
+
+        assert task is None
+
+    def test_parses_backend(self):
+        """Task should parse backend field."""
+        content = '''---
+name: test-task
+priority: 1
+timeout: 30m
+backend: desktop
+---
+Body
+'''
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.md', delete=False) as f:
+            f.write(content)
+            f.flush()
+            task = parse_task_file(Path(f.name))
+
+        assert task.backend == "desktop"
+
+    def test_backend_defaults_to_code(self):
+        """Missing backend should default to code."""
+        content = '''---
+name: test-task
+priority: 1
+timeout: 30m
+---
+Body
+'''
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.md', delete=False) as f:
+            f.write(content)
+            f.flush()
+            task = parse_task_file(Path(f.name))
+
+        assert task.backend == "code"
+
+    def test_validates_backend_values(self):
+        """Invalid backend should return None."""
+        content = '''---
+name: test-task
+priority: 1
+timeout: 30m
+backend: cloud
+---
+Body
+'''
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.md', delete=False) as f:
+            f.write(content)
+            f.flush()
+            task = parse_task_file(Path(f.name))
+
+        assert task is None

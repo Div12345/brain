@@ -19,6 +19,7 @@ TASKS_DIR = BRAIN_ROOT / "tasks"
 # Valid values for schema validation
 VALID_SKILLS = [None, "autopilot", "ralph", "ultrawork", "ecomode", "plan", "analyze", "deepsearch", "tdd"]
 VALID_MODEL_HINTS = ["haiku", "sonnet", "opus"]
+VALID_BACKENDS = ["code", "desktop", "auto"]
 
 
 @dataclass
@@ -30,6 +31,7 @@ class Task:
     estimated_tokens: int = 50000  # Default estimate
     mode: str = "autonomous"  # autonomous | plan-first | read-only
     timeout: str = "30m"
+    backend: str = "code"  # code | desktop | auto
     tags: List[str] = field(default_factory=list)
     depends_on: List[str] = field(default_factory=list)
     deadline: Optional[datetime] = None
@@ -41,6 +43,7 @@ class Task:
     model_hint: str = "sonnet"  # haiku | sonnet | opus
     mcps_required: List[str] = field(default_factory=list)
     inject_capabilities: bool = False
+    ce_aware: bool = False
 
     @property
     def is_runnable(self) -> bool:
@@ -130,15 +133,24 @@ def parse_task_file(path: Path) -> Optional[Task]:
 
         # Extract and validate new fields
         skill = meta.get('skill')
-        if skill is not None and skill not in VALID_SKILLS:
-            raise ValueError(f"Invalid skill: {skill}. Valid: {VALID_SKILLS}")
+        # Handle "null" string as None, and warn on unrecognized skills instead of raising
+        if skill == "null":
+            skill = None
+        elif skill is not None and skill not in VALID_SKILLS:
+            print(f"Warning: unrecognized skill '{skill}' in {path.name}, setting to None")
+            skill = None
 
         model_hint = meta.get('model_hint', 'sonnet')
         if model_hint not in VALID_MODEL_HINTS:
             raise ValueError(f"Invalid model_hint: {model_hint}. Valid: {VALID_MODEL_HINTS}")
 
+        backend = meta.get('backend', 'code')
+        if backend not in VALID_BACKENDS:
+            raise ValueError(f"Invalid backend: {backend}. Valid: {VALID_BACKENDS}")
+
         mcps_required = meta.get('mcps_required', [])
         inject_capabilities = meta.get('inject_capabilities', False)
+        ce_aware = meta.get('ce_aware', False)
 
         return Task(
             name=meta.get('name', path.stem),
@@ -147,6 +159,7 @@ def parse_task_file(path: Path) -> Optional[Task]:
             estimated_tokens=meta.get('estimated_tokens', 50000),
             mode=meta.get('mode', 'autonomous'),
             timeout=meta.get('timeout', '30m'),
+            backend=backend,
             tags=meta.get('tags', []),
             depends_on=meta.get('depends_on', []),
             deadline=deadline,
@@ -155,6 +168,7 @@ def parse_task_file(path: Path) -> Optional[Task]:
             model_hint=model_hint,
             mcps_required=mcps_required if isinstance(mcps_required, list) else [],
             inject_capabilities=inject_capabilities,
+            ce_aware=ce_aware,
         )
     except Exception as e:
         print(f"Error parsing {path}: {e}")
@@ -195,6 +209,6 @@ if __name__ == "__main__":
     for t in tasks:
         deadline = t.deadline.strftime("%Y-%m-%d") if t.deadline else "none"
         print(f"  [{t.priority}] {t.name} ({t.estimated_tokens:,} tokens, deadline: {deadline})")
-        print(f"      mode: {t.mode}, timeout: {t.timeout}")
+        print(f"      mode: {t.mode}, backend: {t.backend}, timeout: {t.timeout}")
         if t.tags:
             print(f"      tags: {', '.join(t.tags)}")

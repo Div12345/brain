@@ -3,7 +3,7 @@ id: research-ai-coding-assistants-2026
 created: 2026-02-04T12:00:00Z
 assignee: claude-desktop
 priority: medium
-status: pending
+status: completed
 type: research
 ---
 

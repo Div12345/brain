@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING
 
 # Import from parent server.py
 sys.path.insert(0, str(Path(__file__).parent.parent))
-from server import get_claude_ws, send_message
+from server import get_main_process_ws as get_claude_ws, send_message
 
 if TYPE_CHECKING:
     from .schema import Response
