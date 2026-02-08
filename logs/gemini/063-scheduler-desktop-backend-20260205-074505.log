@@ -1,0 +1,16 @@
+=== Gemini Task Runner ===
+Task: 063-scheduler-desktop-backend
+Model: gemini-2.5-pro
+Started: Thu Feb  5 07:45:05 EST 2026
+Log: /home/div/brain/logs/gemini/063-scheduler-desktop-backend-20260205-074505.log
+=========================
+YOLO mode is enabled. All tool calls will be automatically approved.
+Loaded cached credentials.
+YOLO mode is enabled. All tool calls will be automatically approved.
+Hook registry initialized with 0 hook entries
+Server 'paper-search' supports tool updates. Listening for changes...
+Error executing tool list_directory: Error listing directory: ENOENT: no such file or directory, stat '/home/div/brain/tools/mcps/claude-desktop-mcp/tools/cc-scheduler'
+Server 'obsidian' supports tool updates. Listening for changes...
+Server 'obsidian' supports resource updates. Listening for changes...
+Error executing tool list_directory: Path must be within one of the workspace directories: /home/div/brain/tools/mcps/claude-desktop-mcp
+Operation cancelled.[ERROR] Operation cancelled.

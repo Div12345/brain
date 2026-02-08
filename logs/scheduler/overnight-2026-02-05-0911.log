@@ -1,0 +1,17 @@
+[09:11:34] === Overnight Task Runner ===
+[09:11:34] Backend: desktop
+[09:11:34] Started: Thu Feb  5 09:11:34 EST 2026
+[09:11:34] Desktop debugger: available
+[09:11:38] Gemini CLI: 0.26.0
+[09:11:38] Running ccq...
+Capacity: ✓ Available | 5h: 68% | 7d: 72%
+Available: ~140,000 tokens
+Phase: autonomous
+
+Warning: unrecognized skill 'research' in 030-ml-pipeline-coverage.md, setting to None
+Warning: unrecognized skill 'research' in 050-experiment-framework-research.md, setting to None
+Warning: unrecognized skill 'design' in 040-code-verification-workflow.md, setting to None
+No tasks fit in available capacity (140,000 tokens)
+[09:11:39] Exit code: 0
+[09:11:39] Finished: Thu Feb  5 09:11:39 EST 2026
+[09:11:39] Log: /home/div/brain/logs/scheduler/overnight-2026-02-05-0911.log

@@ -12,7 +12,7 @@
     },
     "2026-02-03": {
       "planned_percent": 15.0,
-      "actual_percent": 3.0,
+      "actual_percent": 10.0,
       "tasks_planned": [],
       "tasks_completed": [
         {
@@ -38,6 +38,18 @@
           "tokens": 5000,
           "percent": 1.0,
           "timestamp": "2026-02-03T18:02:32.806053"
+        },
+        {
+          "name": "scheduler-setup-skill",
+          "tokens": 5000,
+          "percent": 1.0,
+          "timestamp": "2026-02-03T18:51:00.007624"
+        },
+        {
+          "name": "task-creator-skill",
+          "tokens": 30000,
+          "percent": 6.0,
+          "timestamp": "2026-02-03T19:10:08.713984"
         }
       ]
     },
@@ -49,9 +61,130 @@
     },
     "2026-02-05": {
       "planned_percent": 15.0,
-      "actual_percent": 0.0,
+      "actual_percent": -6.0,
       "tasks_planned": [],
-      "tasks_completed": []
+      "tasks_completed": [
+        {
+          "name": "research-ai-coding-assistants-2026",
+          "tokens": 10000,
+          "percent": 2.0,
+          "timestamp": "2026-02-05T09:05:16.317864"
+        },
+        {
+          "name": "test",
+          "tokens": 0,
+          "percent": 0.0,
+          "timestamp": "2026-02-05T09:05:58.959017"
+        },
+        {
+          "name": "test-scheduler-pipeline",
+          "tokens": 5000,
+          "percent": 1.0,
+          "timestamp": "2026-02-05T09:10:28.423384"
+        },
+        {
+          "name": "review-scheduler-code-quality",
+          "tokens": 0,
+          "percent": 0.0,
+          "timestamp": "2026-02-05T10:23:51.487096"
+        },
+        {
+          "name": "review-scheduler-code-quality",
+          "tokens": 0,
+          "percent": 0.0,
+          "timestamp": "2026-02-05T10:28:46.612186"
+        },
+        {
+          "name": "analyze-obsidian-vault-patterns",
+          "tokens": 0,
+          "percent": 0.0,
+          "timestamp": "2026-02-05T10:30:27.015045"
+        },
+        {
+          "name": "review-scheduler-code-quality",
+          "tokens": -65000,
+          "percent": -13.0,
+          "timestamp": "2026-02-05T15:00:02.805112"
+        },
+        {
+          "name": "analyze-obsidian-vault-patterns",
+          "tokens": 0,
+          "percent": 0.0,
+          "timestamp": "2026-02-05T15:56:17.774341"
+        },
+        {
+          "name": "analyze-obsidian-vault-patterns",
+          "tokens": 0,
+          "percent": 0.0,
+          "timestamp": "2026-02-05T16:34:12.325139"
+        },
+        {
+          "name": "review-scheduler-code-quality",
+          "tokens": 15000,
+          "percent": 3.0,
+          "timestamp": "2026-02-05T16:36:19.903720"
+        },
+        {
+          "name": "analyze-obsidian-vault-patterns",
+          "tokens": 5000,
+          "percent": 1.0,
+          "timestamp": "2026-02-05T16:50:53.622545"
+        },
+        {
+          "name": "fix-mcp-connector-tools",
+          "tokens": 0,
+          "percent": 0.0,
+          "timestamp": "2026-02-05T17:01:34.658671"
+        },
+        {
+          "name": "test-obsidian-mcp-enabled",
+          "tokens": 0,
+          "percent": 0.0,
+          "timestamp": "2026-02-05T17:07:14.730605"
+        },
+        {
+          "name": "test-mcp-fallback-sequence",
+          "tokens": 0,
+          "percent": 0.0,
+          "timestamp": "2026-02-05T17:12:00.133009"
+        },
+        {
+          "name": "test-mcp-connectors-v2",
+          "tokens": 0,
+          "percent": 0.0,
+          "timestamp": "2026-02-05T17:19:16.060939"
+        },
+        {
+          "name": "test-mcp-tools-clear",
+          "tokens": 0,
+          "percent": 0.0,
+          "timestamp": "2026-02-05T17:20:40.956201"
+        },
+        {
+          "name": "test-toggle-any-connector",
+          "tokens": 0,
+          "percent": 0.0,
+          "timestamp": "2026-02-05T17:21:53.420766"
+        },
+        {
+          "name": "test-toggle-fixed",
+          "tokens": 0,
+          "percent": 0.0,
+          "timestamp": "2026-02-05T17:24:16.923564"
+        },
+        {
+          "name": "test-connector-tools-available",
+          "tokens": 0,
+          "percent": 0.0,
+          "timestamp": "2026-02-05T17:26:36.491286"
+        },
+        {
+          "name": "analyze-scheduler-improvements",
+          "tokens": 0,
+          "percent": 0.0,
+          "timestamp": "2026-02-05T18:13:03.008332"
+        }
+      ]
     },
     "2026-02-06": {
       "planned_percent": 10.0,

@@ -1,0 +1,15 @@
+You have claude_desktop MCP tools. Complete this multi-turn task:
+
+GOAL: Get Claude Desktop to write a Python function that validates email addresses with comprehensive edge case handling.
+
+PROTOCOL:
+1. claude_desktop_new (fresh conversation)
+2. claude_desktop_send asking for an email validation function
+3. claude_desktop_read the response
+4. EVALUATE: Does it handle: empty string, missing @, multiple @, unicode, very long addresses, common TLDs?
+5. If not comprehensive enough, send a follow-up asking for specific improvements
+6. Repeat evaluation up to 3 times max
+7. When done, print:
+   - TURNS_USED: <number of send/read cycles>
+   - FINAL_QUALITY: <1-5>
+   - SCENARIO_PASS if quality >= 3, else SCENARIO_FAIL

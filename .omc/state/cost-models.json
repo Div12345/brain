@@ -13,6 +13,30 @@
   },
   "scheduler": {
     "avg_tokens": 5000,
+    "samples": 2
+  },
+  "task": {
+    "avg_tokens": 30000,
+    "samples": 1
+  },
+  "research": {
+    "avg_tokens": 10000,
+    "samples": 1
+  },
+  "test": {
+    "avg_tokens": 122,
+    "samples": 9
+  },
+  "review": {
+    "avg_tokens": -9150,
+    "samples": 4
+  },
+  "analyze": {
+    "avg_tokens": 1050,
+    "samples": 5
+  },
+  "fix": {
+    "avg_tokens": 0,
     "samples": 1
   }
 }

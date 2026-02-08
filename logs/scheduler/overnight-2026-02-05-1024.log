@@ -1,0 +1,29 @@
+[10:24:34] === Overnight Task Runner ===
+[10:24:34] Backend: desktop
+[10:24:34] Started: Thu Feb  5 10:24:34 EST 2026
+[10:24:34] Desktop debugger: available
+[10:24:53] Gemini CLI: 0.26.0
+[10:24:53] Running ccq...
+Capacity: ✓ Available | 5h: 7% | 7d: 73%
+Available: ~135,000 tokens
+Phase: autonomous
+
+Warning: unrecognized skill 'research' in 030-ml-pipeline-coverage.md, setting to None
+Warning: unrecognized skill 'research' in 050-experiment-framework-research.md, setting to None
+Warning: unrecognized skill 'design' in 040-code-verification-workflow.md, setting to None
+Tasks to run: 1
+
+--- review-scheduler-code-quality ---
+Executing review-scheduler-code-quality...
+[10:24:54] Starting gemini process...
+YOLO mode is enabled. All tool calls will be automatically approved.
+Loaded cached credentials.
+YOLO mode is enabled. All tool calls will be automatically approved.
+Hook registry initialized with 0 hook entries
+Attempt 1 failed: You have exhausted your capacity on this model. Your quota will reset after 0s.. Retrying after 325.98300800000004ms...
+✗ Failed in 231.3s
+Log: /home/div/brain/logs/scheduler/2026-02-05-1024-review-scheduler-code-quality.md
+
+[10:28:46] Exit code: 0
+[10:28:46] Finished: Thu Feb  5 10:28:46 EST 2026
+[10:28:46] Log: /home/div/brain/logs/scheduler/overnight-2026-02-05-1024.log

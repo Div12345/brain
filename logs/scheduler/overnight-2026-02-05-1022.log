@@ -1,0 +1,32 @@
+[10:22:36] === Overnight Task Runner ===
+[10:22:36] Backend: desktop
+[10:22:36] Started: Thu Feb  5 10:22:36 EST 2026
+[10:22:36] Desktop debugger: available
+[10:22:48] Gemini CLI: 0.26.0
+[10:22:48] Running ccq...
+Capacity: ✓ Available | 5h: 6% | 7d: 73%
+Available: ~135,000 tokens
+Phase: autonomous
+
+Warning: unrecognized skill 'research' in 030-ml-pipeline-coverage.md, setting to None
+Warning: unrecognized skill 'research' in 050-experiment-framework-research.md, setting to None
+Warning: unrecognized skill 'design' in 040-code-verification-workflow.md, setting to None
+Tasks to run: 1
+
+--- review-scheduler-code-quality ---
+[DRY RUN] Would execute: review-scheduler-code-quality
+Mode: autonomous, Backend: desktop, Timeout: 25m
+(Forced backend: desktop)
+Prompt preview:
+# Review cc-scheduler Code Quality
+
+## Goal
+Perform a thorough code review of the cc-scheduler codebase at ~/brain/tools/cc-scheduler/. Focus on correctness, edge cases, and maintainability.
+
+## Files to Review
+- `lib/tasks.py` — Task schema parsing and validation
+- `lib/executor.py` — Task executio...
+
+[10:22:49] Exit code: 0
+[10:22:49] Finished: Thu Feb  5 10:22:49 EST 2026
+[10:22:49] Log: /home/div/brain/logs/scheduler/overnight-2026-02-05-1022.log

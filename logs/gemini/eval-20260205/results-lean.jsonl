@@ -1,0 +1,4 @@
+{"scenario":"s2-multiturn","model":"gemini-3-pro-preview","status":"UNKNOWN","turns":0,"quality":0}
+{"scenario":"s3-recovery","model":"gemini-3-pro-preview","status":"UNKNOWN","turns":0,"quality":0}
+{"scenario":"s4-complex","model":"gemini-3-pro-preview","status":"PASS","turns":3,"quality":5}
+{"scenario":"s2-multiturn","model":"gemini-2.5-flash","status":"UNKNOWN","turns":0,"quality":0}

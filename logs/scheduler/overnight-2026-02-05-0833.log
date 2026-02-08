@@ -1,0 +1,33 @@
+[08:33:31] === Overnight Task Runner ===
+[08:33:31] Backend: desktop
+[08:33:31] Started: Thu Feb  5 08:33:31 EST 2026
+[08:33:31] Desktop debugger: available
+[08:33:35] Gemini CLI: 0.26.0
+[08:33:35] Running ccq...
+Capacity: ✓ Available | 5h: 54% | 7d: 71%
+Available: ~145,000 tokens
+Phase: autonomous
+
+Error parsing /home/div/brain/tasks/completed/062-gemini-orchestration-instructions.md: Invalid skill: null. Valid: [None, 'autopilot', 'ralph', 'ultrawork', 'ecomode', 'plan', 'analyze', 'deepsearch', 'tdd']
+Error parsing /home/div/brain/tasks/completed/030-ml-pipeline-coverage.md: Invalid skill: research. Valid: [None, 'autopilot', 'ralph', 'ultrawork', 'ecomode', 'plan', 'analyze', 'deepsearch', 'tdd']
+Error parsing /home/div/brain/tasks/completed/050-experiment-framework-research.md: Invalid skill: research. Valid: [None, 'autopilot', 'ralph', 'ultrawork', 'ecomode', 'plan', 'analyze', 'deepsearch', 'tdd']
+Error parsing /home/div/brain/tasks/completed/060-desktop-mcp-test-suite.gemini.md: Invalid skill: null. Valid: [None, 'autopilot', 'ralph', 'ultrawork', 'ecomode', 'plan', 'analyze', 'deepsearch', 'tdd']
+Error parsing /home/div/brain/tasks/completed/040-code-verification-workflow.md: Invalid skill: design. Valid: [None, 'autopilot', 'ralph', 'ultrawork', 'ecomode', 'plan', 'analyze', 'deepsearch', 'tdd']
+Error parsing /home/div/brain/tasks/completed/063-scheduler-desktop-backend.md: Invalid skill: null. Valid: [None, 'autopilot', 'ralph', 'ultrawork', 'ecomode', 'plan', 'analyze', 'deepsearch', 'tdd']
+Tasks to run: 1
+
+--- research-ai-coding-assistants-2026 ---
+[DRY RUN] Would execute: research-ai-coding-assistants-2026
+Mode: autonomous, Backend: code, Timeout: 30m
+(Forced backend: desktop)
+Prompt preview:
+# Research: Top 3 AI Coding Assistants in 2026
+
+## Task
+Research and summarize the top 3 AI coding assistants currently available in 2026, focusing on:
+- Market positioning and adoption metrics
+- Key features and differentiators
+- Supported languages and integrations
+- Pricing models
+- Notable stren...
+

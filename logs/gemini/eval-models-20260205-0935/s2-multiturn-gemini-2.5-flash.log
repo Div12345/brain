@@ -1,0 +1,13 @@
+=== s2-multiturn (gemini-2.5-flash) ===
+Started: Thu Feb  5 10:00:07 EST 2026
+YOLO mode is enabled. All tool calls will be automatically approved.
+Loaded cached credentials.
+YOLO mode is enabled. All tool calls will be automatically approved.
+Hook registry initialized with 0 hook entries
+Attempt 1 failed: You have exhausted your capacity on this model. Your quota will reset after 0s.. Retrying after 946.220677ms...
+Attempt 1 failed: You have exhausted your capacity on this model. Your quota will reset after 0s.. Retrying after 796.647985ms...
+Attempt 1 failed: You have exhausted your capacity on this model. Your quota will reset after 0s.. Retrying after 528.4466580000001ms...
+TURNS_USED: 1
+FINAL_QUALITY: 4
+SCENARIO_PASS
+Finished: Thu Feb  5 10:02:15 EST 2026 (128s)

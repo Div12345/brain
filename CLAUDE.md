@@ -17,12 +17,22 @@ aliases:
 - **Interfaces:** Desktop Claude, Claude Code, Overnight Agent
 - **Coordination:** File-based via GitHub (blackboard pattern)
 
+## Session Start Protocol
+
+**Always do this first:**
+1. Read [[context/State.md]] — current focus, recent decisions, next actions
+2. Check [[dashboards/BOARD.md]] — visual CE pipeline status
+3. Check [[tasks/pending/]] — queued work
+
+**On session end:** Update State.md with decisions made and next actions.
+
 ## Key Commands
 ```bash
-# Check state
-cat context/session-state.md
-cat context/active-agents.md
-ls tasks/pending/
+# Check state (quick)
+cat context/State.md
+
+# Check full context
+cat context/State.md && cat context/active-agents.md && ls tasks/pending/
 
 # Commit work
 git add -A && git commit -m "[type]: description"

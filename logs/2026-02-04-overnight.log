@@ -1,0 +1,11 @@
+2026-02-04 02:00:11 | === Brain Overnight Run Started ===
+2026-02-04 02:00:11 | Lock acquired
+2026-02-04 02:00:11 | Checking capacity...
+2026-02-04 02:00:12 | Capacity response: {"limited": false, "five_hour": 59.0, "weekly": 60.0, "resets_at": "2026-02-04T09:00:00.312181+00:00"}
+2026-02-04 02:00:12 | Capacity: 5h=59.0% 7d=60.0% limited=False
+2026-02-04 02:00:12 | Capacity available. Running ccq...
+Schedule: reserved - Reserved for user - no autonomous tasks
+Use --force to override schedule restrictions.
+2026-02-04 02:00:12 | ccq run completed
+2026-02-04 02:00:12 | Committing changes...
+2026-02-04 02:00:13 | Lock released
