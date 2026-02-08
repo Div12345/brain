@@ -1,0 +1,19 @@
+{
+  "general": {
+    "previewFeatures": true,
+    "model": "gemini-3-pro-preview"
+  },
+  "security": {
+    "auth": {
+      "selectedType": "oauth-personal"
+    }
+  },
+  "mcpServers": {
+    "claude-desktop": {
+      "command": "/home/div/brain/tools/mcps/claude-desktop-mcp/.venv/bin/python",
+      "args": [
+        "/home/div/brain/tools/mcps/claude-desktop-mcp/server.py"
+      ]
+    }
+  }
+}
