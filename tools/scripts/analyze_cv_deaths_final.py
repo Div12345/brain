@@ -18,14 +18,18 @@ def load_waveforms(subject_ids):
 
     print(f"Loading waveforms for {len(subject_ids)} subjects...")
     for sub_id in subject_ids:
-        mat_path = WAVEFORM_DIR / f"{sub_id}.mat"
+        # Check int vs float formatting
+        try:
+            sub_id_int = int(sub_id)
+        except:
+            continue
+
+        mat_path = WAVEFORM_DIR / f"{sub_id_int}.mat"
         if not mat_path.exists():
             continue
 
         try:
             mat = scipy.io.loadmat(str(mat_path))
-            # Structure: mat['carotid'] is (samples, beats) or (samples,)
-            # We want ensemble average
             if "carotid" in mat:
                 c_wav = np.mean(mat["carotid"], axis=1).flatten()
                 waveforms["carotid"].append(c_wav)
@@ -48,9 +52,6 @@ def plot_comparisons(deaths, survivors, outcome_name="CV Death"):
     # Process Survivors
     s_waves = load_waveforms(survivors)["carotid"]
     if s_waves:
-        # Resample to common length (e.g. 250 samples)
-        # For simplicity, assuming comparable length or truncation
-        # Real implementation needs resampling
         min_len = min(len(w) for w in s_waves)
         s_mat = np.array([w[:min_len] for w in s_waves])
         s_mean = np.mean(s_mat, axis=0)
@@ -90,10 +91,13 @@ def main():
         "--outcome_file", type=str, help="Path to file containing outcomes"
     )
     parser.add_argument(
-        "--id_col", type=str, default="number", help="Subject ID column in outcome file"
+        "--id_col",
+        type=str,
+        default="Patient Number",
+        help="Subject ID column in outcome file",
     )
     parser.add_argument(
-        "--target_col", type=str, default="CV_Death", help="Outcome column name"
+        "--target_col", type=str, default="CV Death", help="Outcome column name"
     )
     args = parser.parse_args()
 
@@ -103,35 +107,48 @@ def main():
     # Load Outcome Data
     if args.outcome_file:
         print(f"Loading outcomes from {args.outcome_file}")
-        if args.outcome_file.endswith(".csv"):
-            outcomes = pd.read_csv(args.outcome_file)
+        xl = pd.ExcelFile(args.outcome_file)
+        if "CVD related Information" in xl.sheet_names:
+            print("Loading sheet: CVD related Information")
+            outcomes = xl.parse("CVD related Information")
         else:
             outcomes = pd.read_excel(args.outcome_file)
 
         # Merge
+        print(f"Merging on {args.id_col} (Outcome) vs number (Con Data)...")
         merged = con_data.merge(
             outcomes, left_on="number", right_on=args.id_col, how="left"
         )
         target_col = args.target_col
     else:
-        print(
-            "No outcome file provided. Checking Con Data for 'NameOfCardiacDisease' == 'MI'"
-        )
-        merged = con_data
-        # Create proxy target
-        merged["is_MI"] = merged["NameOfCardiacDisease"].apply(
-            lambda x: 1 if str(x) == "MI" else 0
-        )
-        target_col = "is_MI"
+        print("No outcome file.")
+        return
 
     # Analyze
     print(f"Target: {target_col}")
-    print(merged[target_col].value_counts())
+    if target_col not in merged.columns:
+        print(
+            f"Error: {target_col} not found in merged data. Columns: {list(merged.columns)}"
+        )
+        return
 
+    vc = merged[target_col].value_counts(dropna=False)
+    print(vc)
+
+    # Filter for 1 (Event) vs 0/NaN (No Event)
+    # Assume 1.0 is death
     deaths = merged[merged[target_col] == 1]["number"].tolist()
-    survivors = merged[merged[target_col] == 0]["number"].tolist()
+    # Survivors: 0 or NaN (if we assume missing = survivor, checking Death column)
+    # Actually, check 'Death' column too
+    if "Death" in merged.columns:
+        print("Death counts:")
+        print(merged["Death"].value_counts(dropna=False))
 
-    print(f"Death IDs: {deaths}")
+    survivors = merged[merged[target_col] != 1]["number"].tolist()
+    # Limit survivors for plotting speed
+    survivors = survivors[:50]
+
+    print(f"Death IDs (n={len(deaths)}): {deaths}")
 
     # Plot
     plot_comparisons(deaths, survivors, outcome_name=target_col)
