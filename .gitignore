@@ -1,0 +1,15 @@
+# OMC state (machine-local)
+.omc/sessions/
+.omc/state/checkpoints/
+.omc/state/subagent-tracking.json
+
+# Python
+__pycache__/
+*.pyc
+
+# Temp files
+*.tmp
+WinPowerPlans.txt
+
+# Logs (optional - uncomment to ignore)
+# logs/
