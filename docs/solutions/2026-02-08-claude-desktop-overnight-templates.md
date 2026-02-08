@@ -11,31 +11,39 @@ tags:
 
 ## Task 1: Codebase Audit (Arterial Analysis)
 
-**Copy-paste this into Claude Desktop:**
+**STATUS: Plan exists, execution not yet done.**
+
+A CC Web session (session_0196fsjA8FFUVmr8Bre5kJMT) already created:
+- `/home/div/AAA_detection_personal/docs/plans/2026-02-08-codebase-audit-plan.md` - full audit methodology
+- `/home/div/AAA_detection_personal/docs/context/audit-context-from-obsidian.md` - project context
+
+**Copy-paste this into Claude Desktop to CONTINUE the audit:**
 
 ```
-CONTEXT: I'm delegating a codebase audit for my arterial analysis ML pipeline. The code has been modified by AI agents and I need to regain confidence before presenting results.
+CONTEXT: Continuing a codebase audit that was planned but not yet executed.
 
-CODEBASE: /home/div/AAA_detection_personal (accessible via filesystem MCP or desktop-commander)
+CODEBASE: /home/div/AAA_detection_personal (use desktop-commander MCP for file access)
 
-FIRST: Read Dashboard/State.md from Obsidian for current context, then read Projects/arterial analysis/sessions/2026-02-07-monday-update-brainstorm.md — specifically Task 1 (Codebase Audit).
+FIRST: Read these files in order:
+1. /home/div/AAA_detection_personal/docs/plans/2026-02-08-codebase-audit-plan.md — THE FULL PLAN (follow this exactly)
+2. /home/div/AAA_detection_personal/docs/context/audit-context-from-obsidian.md — project context
+3. /home/div/AAA_detection_personal/CLAUDE.md — conventions
 
-YOUR TASK:
-1. Read the entire pipeline end-to-end in /home/div/AAA_detection_personal
-2. Explain what each level/module does and justify it
-3. Document what tests exist (pytest), what they cover, what's missing
-4. Check all random states are properly set for reproducibility
-5. Check experiment configs are correct and consistent
-6. Flag anything suspicious or non-deterministic
-7. If possible, run experiments for all 3 targets (cSBP, cPP, cfPWV) and confirm deterministic results
+YOUR TASK: Execute the audit plan. It tells you exactly what to do:
+- Audit each module in src/
+- Run tests
+- Check determinism for all 3 targets (cSBP, cPP, cfPWV)
+- Trace feature selection leakage
+- Document random states
 
-PRODUCE: A structured report I can use as a guide when reviewing code files myself. Save to:
-- Projects/arterial analysis/sessions/2026-02-08-codebase-audit-report.md (via Obsidian MCP)
+PRODUCE: Write the report to /home/div/AAA_detection_personal/docs/plans/2026-02-08-codebase-audit-report.md as specified in the plan.
+
+Also save a copy to Obsidian: Projects/arterial analysis/sessions/2026-02-08-codebase-audit-report.md
 
 COMPOUND PROTOCOL (when done):
 - Update Dashboard/State.md with what you did
 - Append learnings to Projects/brain system/compound-log.md
-- If you discover reusable patterns, note them for docs/solutions/
+- Commit to git: git add -A && git commit -m "[audit]: codebase audit report"
 ```
 
 ---
