@@ -18,3 +18,9 @@ watch-queue = "scripts.watch_queue:main"
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
+
+[tool.pytest.ini_options]
+markers = [
+    "integration: tests that require a live Claude Desktop instance",
+    "slow: tests that are slow to run (e.g., waiting for generation)",
+]
