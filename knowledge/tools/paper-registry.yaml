@@ -1,0 +1,149 @@
+# Paper Acquisition Registry
+# Tracks all papers through the pipeline: discovery → download → Zotero → NLM
+# Updated: 2026-02-09
+
+staging_dir: /home/div/brain/downloads/
+
+papers:
+  vabalas-2019:
+    title: "Machine learning algorithm validation with a limited sample size"
+    authors: [Vabalas, Gowen, Poliakoff, Casson]
+    year: 2019
+    doi: "10.1371/journal.pone.0224365"
+    journal: PLOS ONE
+    access: open_access
+    download:
+      method: curl_direct
+      url: "https://journals.plos.org/plosone/article/file?id=10.1371/journal.pone.0224365&type=printable"
+      file: vabalas2019.pdf
+      size_mb: 1.3
+      verified: true
+    zotero:
+      status: exists
+      item_key: 7K6JRW6Q
+    nlm:
+      status: not_uploaded
+      notebook: null
+      source_id: null
+    tags: [cross-validation, small-sample, validation-bias]
+
+  meinshausen-2010:
+    title: "Stability Selection"
+    authors: [Meinshausen, Bühlmann]
+    year: 2010
+    doi: "10.1111/j.1467-9868.2010.00740.x"
+    journal: "Journal of the Royal Statistical Society Series B"
+    access: paywalled
+    download:
+      method: search_scihub
+      doi_format: bare
+      file: 10_1111_j_1467_9868_2010_00740_x.pdf
+      size_mb: 11.5
+      verified: true
+    zotero:
+      status: exists
+      item_key: 8NMA2USC
+    nlm:
+      status: uploaded
+      notebook: stability-selection
+      source_id: null  # uploaded before tracking
+    tags: [stability-selection, feature-selection, LASSO, error-control]
+
+  faletto-2022:
+    title: "Cluster Stability Selection"
+    authors: [Faletto, Bien]
+    year: 2022
+    doi: "10.48550/arXiv.2201.00494"
+    journal: "arXiv preprint"
+    access: open_access
+    download:
+      method: arxiv_download
+      arxiv_id: "2201.00494"
+      file: 2201.00494.pdf
+      size_mb: 1.4
+      verified: true
+    zotero:
+      status: imported
+      item_key: null  # imported via connector/saveItems
+      method: zotero-import.py --arxiv
+    nlm:
+      status: uploaded
+      notebook: stability-selection
+      source_id: "e454e326-db29-4939-aa8e-a07ea5c21697"
+    tags: [cluster-stability, correlated-features, feature-selection, LASSO]
+
+  bodinier-2023:
+    title: "sharp: Stability-enHanced Approaches using Resampling Procedures"
+    authors: [Bodinier, Filippi, Nost, Chiquet, Chadeau-Hyam]
+    year: 2023
+    doi: "10.48550/arXiv.2106.02521"
+    journal: "arXiv preprint"
+    access: open_access
+    download:
+      method: arxiv_download
+      arxiv_id: "2106.02521v2"
+      file: 2106.02521v2.pdf
+      size_mb: 5.5
+      verified: true
+    zotero:
+      status: imported
+      item_key: null  # imported via connector/saveItems
+      method: zotero-import.py --arxiv
+    nlm:
+      status: uploaded
+      notebook: stability-selection
+      source_id: "4fce9bef-e402-4ad0-9e56-335fff66d7cd"
+    nlm_upload_method: source_add(type=file)
+    tags: [stability-selection, R-package, resampling, calibration]
+
+  tibshirani-2005:
+    title: "Sparsity and smoothness via the fused lasso"
+    authors: [Tibshirani, Saunders, Rosset, Zhu, Knight]
+    year: 2005
+    doi: "10.1111/j.1467-9868.2005.00490.x"
+    journal: "Journal of the Royal Statistical Society Series B"
+    access: paywalled
+    download:
+      method: needs_chrome
+      file: null
+      verified: false
+      notes: "Pre-2005 JRSSB not on sci-hub, publisher blocks curl"
+    zotero:
+      status: imported
+      item_key: null  # imported via connector/saveItems
+      method: zotero-import.py --doi
+    nlm:
+      status: not_uploaded
+      notebook: null
+      source_id: null
+    tags: [fused-lasso, spatial-features, waveform, regularization]
+
+  chen-2008:
+    title: "Extended Bayesian information criteria for model selection with large model spaces"
+    authors: [Chen, Chen]
+    year: 2008
+    doi: "10.1093/biomet/asn034"
+    journal: Biometrika
+    access: paywalled
+    download:
+      method: needs_chrome
+      file: null
+      verified: false
+      notes: "Biometrika not on sci-hub for this paper, publisher blocks curl"
+    zotero:
+      status: imported
+      item_key: null  # imported via connector/saveItems
+      method: zotero-import.py --doi
+    nlm:
+      status: not_uploaded
+      notebook: null
+      source_id: null
+    tags: [BIC, EBIC, model-selection, information-criterion]
+
+# Zotero Import Script
+# --------------------
+# python3 tools/scripts/zotero-import.py --doi "10.xxxx/yyyy" --tags "tag1,tag2"
+# python3 tools/scripts/zotero-import.py --arxiv "XXXX.XXXXX" --tags "tag1,tag2"
+# Requires Zotero desktop running (connector at localhost:23119)
+#
+# All 4 pending papers imported 2026-02-09 via zotero-import.py
