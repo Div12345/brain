@@ -102,6 +102,17 @@ This repo follows the compound engineering methodology: each task should make th
 3. **Assess** — Multi-perspective review, evidence before claims
 4. **Compound** — Capture learnings, update rules, feed back into next Plan
 
+## Knowledge Base Auto-Triggers
+
+When the user mentions these topics, **always search `docs/solutions/` first** before investigating:
+
+| Keywords | Search For | Key Doc |
+|----------|-----------|---------|
+| throttlestop, CPU throttling, power limits, BD PROCHOT, speed shift, PL1, PL2 | `grep -r "throttlestop\|PROCHOT\|LockPowerLimits" docs/solutions/` | `2026-02-07-throttlestop-dell-non-dell-charger-fix.md` |
+| Dell power, charger, battery throttle | same as above | same |
+
+This prevents re-investigating solved problems. Read the doc, apply known fixes, THEN investigate if the issue is new.
+
 ## See Also
 - [[meta/contribution-workflow]] - Full PR/contribution guide
 - [[messages/README]] - Inter-agent messaging

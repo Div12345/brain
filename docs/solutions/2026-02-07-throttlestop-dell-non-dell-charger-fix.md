@@ -15,6 +15,9 @@ symptoms:
   - "Battery draining while plugged in"
   - "CPU throttling with non-Dell charger"
   - "ThrottleStop won't restart after first close"
+  - "CPU stuck at base clock on battery"
+  - "LockPowerLimits=0 allows BIOS override"
+  - "BD PROCHOT not disabled despite scheduled task"
 module: windows-system
 severity: medium
 hardware:
@@ -226,6 +229,68 @@ Get-Content ThrottleStop.ini | Select-String "StartFailed|SSTEPP|SpeedShift"
 - [ ] Enable SSTEPP=1 for Speed Shift EPP
 - [ ] Create Task Scheduler entry for admin-less startup
 - [ ] Check battery health if charging issues persist
+
+## Update: 2026-02-08 — C:\Tools Installation Fix
+
+### Problem
+After relocating ThrottleStop to `C:\Tools\ThrottleStop\` with a proper scheduled task, the config had critical settings missing/wrong compared to the Downloads version. CPU was stuck at 2.3-2.7 GHz (base clock) despite ThrottleStop running.
+
+### Root Causes Found
+
+| Setting | Was | Problem |
+|---------|-----|---------|
+| LockPowerLimits | 0 | BIOS freely overrode ThrottleStop power limits every few seconds |
+| PROCHOT_Activate | 0 | BD PROCHOT not disabled — Dell's main throttle signal still active |
+| Battery PL1 | 25W | Too low for i7-12700H (stock 45W TDP) |
+| Battery PL2 | 45W | Low burst headroom |
+| Battery max freq | 2.5 GHz | Capped a 4.7GHz chip |
+| Battery EPP | 220 | Extreme power saving |
+| SSTEPP | 0 | EPP values not written to CPU |
+| ACProfile/DCProfile | missing | No auto-switch between AC/battery profiles |
+
+### Fix Applied
+
+```ini
+# Critical global settings
+LockPowerLimits=1        # Was 0 — prevents BIOS override
+PROCHOT_Activate=1       # Was 0 — disables Dell BD PROCHOT
+SSTEPP=1                 # Was 0 — actually applies EPP values
+ACProfile=0              # Auto-switch to Performance on AC
+DCProfile=3              # Auto-switch to Battery on DC
+
+# Battery profile (profile 4) improvements
+PowerLimitEAX3=0x00DF8168   # PL1: 25W → 45W
+PowerLimitEDX3=0x00428280   # PL2: 45W → 80W
+SpeedShiftMaxMin3=0x2804    # Max: 2.5GHz → 4.0GHz
+EnPerfPref3=128             # EPP: 220 → 128 (balanced)
+```
+
+### Updated Profile Table
+
+| Profile | Name | PL1 | PL2 | Max Freq | EPP | Use Case |
+|---------|------|-----|-----|----------|-----|----------|
+| 1 | Performance | 80W | 115W | 4.7 GHz | 0 (max) | Full performance on AC |
+| 2 | Game | 80W | 115W | 4.7 GHz | 32 (near max) | Gaming on AC |
+| 3 | Internet | 35W | 65W | 3.5 GHz | 160 (efficient) | Light use on AC |
+| 4 | Battery | 45W | 80W | 4.0 GHz | 128 (balanced) | Auto on battery |
+
+### Key Insight: Two Installations Problem
+The Downloads version (`C:\Users\din18\Downloads\ThrottleStop_9.7.3\`) had correct settings but wasn't the active one. The Tools version (`C:\Tools\ThrottleStop\`) was launched by the scheduled task but had default/incomplete settings. **Always verify the active installation matches the scheduled task path.**
+
+### Result
+- CPU boosted from locked 2.3 GHz to 3.0-3.5 GHz range on AC
+- Full turbo (4.7 GHz) requires confirming admin rights (ThrottleStop needs elevation for MSR writes)
+
+### Important: Restarting ThrottleStop
+ThrottleStop runs as admin via scheduled task. Cannot be killed from WSL/non-admin shell. To restart:
+1. Close from system tray (right-click → Exit)
+2. Re-launch via: `schtasks /Run /TN ThrottleStop`
+
+### 6. LockPowerLimits is the #1 Setting
+Without `LockPowerLimits=1`, Dell BIOS continuously resets power limits. ThrottleStop sets them, BIOS overrides them seconds later. This creates a cycle where the CPU appears to be at base clock despite ThrottleStop running. **Always verify this is set to 1.**
+
+### 7. Two Installations = Silent Failure
+Having ThrottleStop in Downloads (configured) AND Tools (default settings) means the scheduled task runs the wrong config. The fix works silently — no errors, just throttling. **Check `schtasks /Query /TN ThrottleStop /V` to verify the executable path matches your configured INI.**
 
 ## Related
 
