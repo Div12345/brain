@@ -10,6 +10,10 @@ tags:
   - speed-shift
   - windows-defender
   - 12th-gen-intel
+  - exploit-guard
+  - asr-rules
+  - intel-dptf
+  - domain-managed
 symptoms:
   - "could not start driver: io error"
   - "Battery draining while plugged in"
@@ -291,6 +295,99 @@ Without `LockPowerLimits=1`, Dell BIOS continuously resets power limits. Throttl
 
 ### 7. Two Installations = Silent Failure
 Having ThrottleStop in Downloads (configured) AND Tools (default settings) means the scheduled task runs the wrong config. The fix works silently — no errors, just throttling. **Check `schtasks /Query /TN ThrottleStop /V` to verify the executable path matches your configured INI.**
+
+## Update: 2026-02-09 — Exploit Guard ASR + Intel DPTF (The Real Throttlers)
+
+### Problem
+ThrottleStop running with correct config, but severe throttling on AC persisted. CPU stuck at ~65% performance. User running on battery to avoid throttling (backwards).
+
+### Root Causes Found
+
+**Two hidden throttling layers operating independently of ThrottleStop:**
+
+#### 1. Exploit Guard ASR Rule (Vulnerable Driver Blocklist)
+Defender Exploit Guard rule `56A863A9-875E-4185-98A7-B882C64B5CE5` ("Block abuse of exploited vulnerable signed drivers") was blocking ThrottleStop's MSR operations at kernel level.
+
+**Critical distinction:** Antivirus file exclusions (`Add-MpPreference -ExclusionPath`) do NOT affect ASR rules. These are completely separate systems:
+
+| Exclusion Type | Covers | Command |
+|----------------|--------|---------|
+| Antivirus | File scanning, quarantine | `Add-MpPreference -ExclusionPath` |
+| **ASR** | **Kernel driver operations, exploit guard** | `Add-MpPreference -AttackSurfaceReductionOnlyExclusions` |
+
+**Evidence from Event Log:**
+```
+Event 1121: Microsoft Defender Exploit Guard has blocked an operation
+that is not allowed by your IT administrator.
+ID: 56A863A9-875E-4185-98A7-B882C64B5CE5
+Path: C:\Windows\SystemTemp\UDD1423.tmp
+```
+
+#### 2. Intel DPTF (Dynamic Platform and Thermal Framework)
+Service `dptftcs` was independently throttling CPU based on Dell's thermal/power policies, completely bypassing ThrottleStop.
+
+### Domain-Managed Machine Complication
+Machine is joined to `univ.pitt.edu` — IT Group Policy enforces ASR rules. `Set-MpPreference -AttackSurfaceReductionRules_Actions Disabled` **silently fails** (command appears to succeed but policy overrides it).
+
+**How to verify ASR rule status:**
+```powershell
+# Save as check-asr.ps1, run as admin
+$ids = (Get-MpPreference).AttackSurfaceReductionRules_Ids
+$actions = (Get-MpPreference).AttackSurfaceReductionRules_Actions
+for ($i=0; $i -lt $ids.Count; $i++) {
+    if ($ids[$i] -like "56A863A9*") {
+        # Action: 0=Disabled, 1=Block, 2=Audit, 6=Warn
+        "Rule: $($ids[$i]) Action: $($actions[$i])"
+    }
+}
+```
+
+### Fix Applied
+
+```powershell
+# 1. ASR EXCLUSIONS (works even when rule is policy-enforced)
+Add-MpPreference -AttackSurfaceReductionOnlyExclusions "C:\Users\din18\Downloads\ThrottleStop_9.7.3\"
+Add-MpPreference -AttackSurfaceReductionOnlyExclusions "C:\Users\din18\AppData\Local\Temp\ThrottleStop.sys"
+Add-MpPreference -AttackSurfaceReductionOnlyExclusions "C:\Users\din18\Downloads\ThrottleStop_9.7.3\ThrottleStop.exe"
+
+# 2. Disable Intel DPTF
+Stop-Service dptftcs -Force
+Set-Service dptftcs -StartupType Disabled
+```
+
+### Result
+
+| Metric | Before | After |
+|--------|--------|-------|
+| CPU Performance | 65-67% | **81.7%** |
+| Defender blocks | Event 1121 every startup | **None** |
+| Battery on AC | Draining | **Charging at 21-25W** |
+| DPTF | Running, throttling | **Stopped, disabled** |
+
+### Key Learnings
+
+#### 8. Antivirus Exclusions ≠ ASR Exclusions
+This is the most critical learning. Three separate Defender exclusion systems exist:
+1. **Antivirus exclusions** (`-ExclusionPath`) — skips file scanning
+2. **ASR exclusions** (`-AttackSurfaceReductionOnlyExclusions`) — skips exploit guard rules
+3. **Controlled Folder Access exclusions** — skips ransomware protection
+
+ThrottleStop needs **both** #1 and #2.
+
+#### 9. Group Policy Silently Overrides Local Settings
+On domain-joined machines, `Set-MpPreference` for ASR rules appears to succeed but Group Policy reapplies the blocked state. **ASR exclusions** are the workaround — they work even when the rule itself is policy-locked.
+
+#### 10. Intel DPTF is a Hidden Throttler
+DPTF (`dptftcs` service) throttles independently of ThrottleStop. It can limit CPU based on Dell's own thermal/power policies. Disabling it is safe — ThrottleStop handles thermal management instead.
+
+#### 11. Multiple Throttling Layers on Dell
+Dell laptops with non-Dell chargers face **four independent throttling layers**:
+1. **EC-level** — Hardware charger detection (can't fully override)
+2. **BD PROCHOT** — CPU-level signal (ThrottleStop disables)
+3. **Intel DPTF** — OS-level thermal framework (disable service)
+4. **Exploit Guard ASR** — Blocks driver MSR writes (add ASR exclusion)
+
+All four must be addressed for full performance.
 
 ## Related
 

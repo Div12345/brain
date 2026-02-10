@@ -90,6 +90,15 @@ echo "..." > messages/outbox/MSG-<timestamp>-<from>-<to>.md
 
 This repo follows the compound engineering methodology: each task should make the next task easier.
 
+### Core Principles
+> Source: [Compound Engineering — How Every Codes With Agents](https://every.to/guides/compound-engineering)
+
+- **Minimalism with necessity.** Add only what's needed. Three similar lines > premature abstraction. Delete what isn't used.
+- **Systems over artifacts.** Build things that make future work easier, not one-off deliverables.
+- **80/20 planning.** Plan enough to start confidently, not exhaustively. The work teaches you what the plan couldn't.
+- **Each unit of work compounds.** If it doesn't make the next task easier, ask why you're doing it.
+- **Taste in infrastructure.** The system should feel good to use. If it doesn't, fix the system, not the user.
+
 ### Key Directories
 - `docs/plans/` — CE plan files (persistent across sessions)
 - `docs/brainstorms/` — CE brainstorm files
