@@ -2,7 +2,7 @@
 title: Lean Self-Service Personal System Redesign
 type: refactor
 date: 2026-02-11
-status: phase-0-complete
+status: phase-4-complete
 principles: [self-service, programmatic, lean, compounding, agent-optional]
 ---
 
@@ -423,9 +423,99 @@ docs/ (plans, solutions, brainstorms — already working)
 - [x] Command Center updated with Dataview experiment tracking queries
 - [ ] Plotivy folder structure for code repo (separate task — requires work in AAA repo)
 
-**Phase 4: Brain repo** — PENDING (lower priority, system works without this)
+**Phase 4: Interaction automation** — ✅ COMPLETE (2026-02-11)
+- [x] QuickAdd macros configured: New Ingredient, New Recipe, Grocery Trip, New Experiment, Log Meal
+- [x] Bases views created: `Ingredient Manager.base` (4 views: All, Restock, In Stock, By Location)
+- [x] Bases views created: `Experiment Tracker.base` (3 views: All, Best Results, By Status)
+- [x] Templater folder templates: ingredients/ → Ingredient template, recipes/ → Stack template, experiments/ → Experiment Log
+- [x] Cooking Stack template fixed: removed stale `needs_restock` field
+- [x] CodeGraphContext MCP server installed (`uv tool install`) and configured (`.mcp.json`)
 
-**Phase 5: Cross-cutting** — PENDING (slash commands, "without agent" docs)
+**Phase 5: Brain repo** — PENDING (lower priority, system works without this)
+
+**Phase 6: Cross-cutting** — PENDING (slash commands, "without agent" docs)
+
+---
+
+## Full-Stack Reference (What's Built)
+
+### Cooking Domain — Complete Stack
+
+| Layer | Component | Human Access | Agent Access |
+|-------|-----------|-------------|-------------|
+| **Registry** | 107 ingredient notes in `Projects/cooking/ingredients/` | Properties panel (toggle `have`) | Obsidian MCP `obsidian_read_note`, filesystem |
+| **Registry** | 9 recipe notes in `Projects/cooking/recipes/` | Open note, read component table | Obsidian MCP, filesystem read |
+| **Rules** | Recipe `ingredients` list → links to ingredient notes | Automatic via Dataview | Parse frontmatter YAML |
+| **Views** | Command Center (`Projects/cooking/Command Center.md`) | Open note → see computed views | Read note via MCP |
+| **Views** | `Ingredient Manager.base` — spreadsheet with 4 views | Open .base file in Obsidian | Read .base YAML |
+| **Capture** | QuickAdd: "New Ingredient" → creates note in ingredients/ | `Ctrl+P` → QuickAdd → New Ingredient | Obsidian MCP `obsidian_update_note` |
+| **Capture** | QuickAdd: "Grocery Trip" → pre-filled restock checklist | `Ctrl+P` → QuickAdd → Grocery Trip | Create note via MCP with template |
+| **Capture** | QuickAdd: "Log Meal" → appends to daily note ## Meals | `Ctrl+P` → QuickAdd → Log Meal | Append to daily note via MCP |
+| **Capture** | Templater folder template: ingredients/ auto-applies | Create any note in ingredients/ | Write file to ingredients/ path |
+| **Feedback** | Toggle `have` property after cooking/shopping | Properties panel checkbox | `obsidian_manage_frontmatter` |
+
+### Research Domain — Complete Stack
+
+| Layer | Component | Human Access | Agent Access |
+|-------|-----------|-------------|-------------|
+| **Registry** | Experiment notes in `Projects/arterial analysis/experiments/` | Properties panel | Obsidian MCP, filesystem |
+| **Rules** | Frontmatter: target, method, status, r2, mae, rmse | Visible in Properties | Parse YAML |
+| **Views** | Command Center with Dataview queries by target | Open Command Center | Read via MCP |
+| **Views** | `Experiment Tracker.base` — 3 views (All, Best, By Status) | Open .base file | Read .base YAML |
+| **Capture** | QuickAdd: "New Experiment" → creates in experiments/ | `Ctrl+P` → QuickAdd | Create note via MCP |
+| **Capture** | Templater folder template: experiments/ auto-applies | Create any note in experiments/ | Write to experiments/ path |
+| **Feedback** | Update status/r2/rmse after running experiment | Edit properties | `obsidian_manage_frontmatter` |
+
+### Day Planning Domain — Partial Stack
+
+| Layer | Component | Human Access | Agent Access |
+|-------|-----------|-------------|-------------|
+| **Registry** | Daily notes in `Daily/YYYY-MM-DD.md` | Daily note plugin | Obsidian MCP |
+| **Rules** | `energy` property → filters tasks by energy_needed | Set energy, tasks auto-filter | Read/write frontmatter |
+| **Views** | Dataview query in daily template | Embedded in daily note | Read daily note |
+| **Capture** | Daily note template with energy/sleep fields | Core daily note plugin | Create note via MCP |
+| **Feedback** | Log energy, meals, completions in daily note | Edit note | Append via MCP |
+
+### Installed Tools & Plugins
+
+| Tool | Location | Purpose |
+|------|----------|---------|
+| QuickAdd 2.11.0 | OneVault plugin | 5 macros: New Ingredient, New Recipe, Grocery Trip, New Experiment, Log Meal |
+| Templater 2.18.1 | OneVault plugin | Folder templates: ingredients/, recipes/, experiments/ |
+| Dataview | OneVault plugin | Query engine for all computed views |
+| Bases (core) | Obsidian core | Spreadsheet views: Ingredient Manager, Experiment Tracker |
+| CodeGraphContext | `~/.local/bin/cgc` | MCP server for code graph analysis (`.mcp.json`) |
+
+### Key File Paths (OneVault)
+
+```
+Projects/cooking/
+├── Command Center.md          ← DataviewJS: "What Can I Make", restock, fridge/freezer/pantry
+├── shopping.md                ← Dataview: auto-computed restock list
+├── Ingredient Manager.base    ← Bases: spreadsheet view for bulk editing
+├── ingredients/               ← 107 notes (one per ingredient)
+│   ├── zhoug-sauce.md
+│   ├── black-beans-canned.md
+│   └── ...
+└── recipes/                   ← 9 notes (one per recipe/stack)
+    ├── desi-mex-black-bean-tacos.md
+    └── ...
+
+Projects/arterial analysis/
+├── Command Center.md          ← Dataview: experiments by target, best results
+├── Experiment Tracker.base    ← Bases: spreadsheet + kanban by status
+└── experiments/               ← 3 seed notes
+    ├── csbp-stepwise-ols-baseline.md
+    ├── cpp-stepwise-ols-baseline.md
+    └── cfpwv-stepwise-ols-baseline.md
+
+Meta/Templates/
+├── (TEMPLATE) Cooking Ingredient.md
+├── (TEMPLATE) Cooking Stack.md
+├── (TEMPLATE) Grocery Trip.md
+├── (TEMPLATE) Daily.md
+└── Experiment Log.md
+```
 
 ---
 
