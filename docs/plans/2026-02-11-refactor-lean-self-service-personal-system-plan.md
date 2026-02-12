@@ -403,15 +403,29 @@ docs/ (plans, solutions, brainstorms — already working)
 - [x] Templates updated: Ingredient, Recipe/Stack, Daily (with energy), Grocery Trip (new)
 - [x] Migration script: `tools/scripts/migrate-cooking.py`
 
-**Phase 1: Cooking full stack** — ✅ MERGED INTO PHASE 0
+**Phase 1: Cooking fixes** — ✅ COMPLETE (2026-02-11)
+- [x] Fixed data model: unified ingredients + needs_restock into single list
+- [x] Created 25 missing ingredient notes (all referenced by recipes, have: false)
+- [x] Switched "What Can I Make" to DataviewJS (DQL can't dereference links)
+- [x] Added "What's Missing per Recipe" view (1-3 ingredients away)
+- [x] Total: 107 ingredient notes, 9 recipes, all properly linked
+- [x] Fix script: `tools/scripts/fix-recipes.py`
 
-**Phase 2: Daily planning** — template update, energy-matching Dataview, 1-week trial
+**Phase 2: Daily planning** — ✅ COMPLETE (2026-02-11)
+- [x] Daily template updated with `energy` and `sleep` properties
+- [x] Energy-matched task Dataview query added to daily template
+- [ ] 1-week trial (user needs to use it)
 
-**Phase 3: Research** — experiment notes, Plotivy code structure, Command Center Dataview
+**Phase 3: Research** — ✅ COMPLETE (2026-02-11)
+- [x] Experiment Log template updated for ML research (target, method, r2, mae, rmse)
+- [x] experiments/ folder created under arterial analysis
+- [x] 3 seed experiment notes from known results (cSBP, cPP, cfPWV baselines)
+- [x] Command Center updated with Dataview experiment tracking queries
+- [ ] Plotivy folder structure for code repo (separate task — requires work in AAA repo)
 
-**Phase 4: Brain repo** — cleanup, task properties, context consolidation
+**Phase 4: Brain repo** — PENDING (lower priority, system works without this)
 
-**Phase 5: Cross-cutting** — Templater capture scripts, slash commands, "without agent" docs
+**Phase 5: Cross-cutting** — PENDING (slash commands, "without agent" docs)
 
 ---
 
