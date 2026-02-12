@@ -144,4 +144,4 @@ This maps: min(signal) → DBP, mean(signal) → MBP. The "foot" alternative wou
 
 ## Related Issues
 
-No related issues documented yet.
+- See also: [Research Pipeline Tooling Stack](../best-practices/research-pipeline-tooling-stack-ArterialAnalysis-20260212.md) — tooling decisions for this project rebuild
