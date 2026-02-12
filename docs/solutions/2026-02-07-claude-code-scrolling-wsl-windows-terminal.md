@@ -102,6 +102,7 @@ The `smcup@:rmcup@` overrides disable alternate screen for apps inside tmux.
 
 ## Related Issues
 
+- See also: [CC Prompt Disappears — Alacritty Fix](ui-bugs/cc-prompt-disappears-wsl2-alacritty-fix-20260211.md) — switching terminal entirely to bypass ConPTY rendering issues
 - [GitHub #21386](https://github.com/anthropics/claude-code/issues/21386) - Option to disable mouse capture
 - [GitHub #23581](https://github.com/anthropics/claude-code/issues/23581) - Add option to disable mouse tracking in TUI
 

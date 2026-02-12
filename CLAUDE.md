@@ -124,6 +124,25 @@ When the user mentions these topics, **always search `docs/solutions/` first** b
 
 This prevents re-investigating solved problems. Read the doc, apply known fixes, THEN investigate if the issue is new.
 
+## Obsidian Vault (via MCP)
+
+The Obsidian vault is the user's knowledge base, accessed via MCP tools (`obsidian_read_note`, `obsidian_update_note`, etc.).
+
+**The 3 Rules:**
+1. Capture to Inbox — anything, no tags needed
+2. Active interests get a Home — Command Centers in `Projects/`
+3. Link when you touch — add one `[[link]]` when you open a note
+
+**Key locations in vault:**
+- `Dashboard/HOME.md` — unified hub linking all spaces
+- `Meta/Vault Rules.md` — the 3 rules
+- `Dashboard/State.md` — current state (all interfaces read/write)
+- `Projects/{name}/Command Center.md` — home base per space
+
+**Active spaces:** arterial analysis, phd, cooking, brain system, cardiac output estimation, room redesign
+
+**Inbox:** ~152 notes awaiting processing (delegate to overnight agent)
+
 ## See Also
 - [[meta/contribution-workflow]] - Full PR/contribution guide
 - [[messages/README]] - Inter-agent messaging
