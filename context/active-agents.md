@@ -16,7 +16,7 @@ updated: 2026-02-11T17:30
 | Agent | Interface | Working On | Since | Status |
 |-------|-----------|------------|-------|--------|
 | code-main | Claude Code | Task triage, question resolution | 2026-02-01 | Active |
-| desktop-new | Claude Desktop | OneNote inventory (Task 083) | 2026-02-11 | Pending pickup |
+| desktop-new | Claude Desktop | OneNote inventory (Task 083) | 2026-02-11 | Active (Opus 4.6 Extended) |
 
 ## Claimed Work Areas
 
@@ -37,7 +37,7 @@ updated: 2026-02-11T17:30
 ## Task Status
 
 ### Task 083: Windows OneNote Inventory
-- **Status:** Pending pickup (ready to start)
+- **Status:** Active (CD generating, running PowerShell scans)
 - **Assigned To:** Claude Desktop / Overnight Agent
 - **Target:** `C:\Users\din18\` (all OneNote locations)
 - **Output:** `Projects/Mining Results/onenote-inventory.md` (Obsidian)
