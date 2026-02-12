@@ -119,6 +119,8 @@ When the user mentions these topics, **always search `docs/solutions/` first** b
 |----------|-----------|---------|
 | throttlestop, CPU throttling, power limits, BD PROCHOT, speed shift, PL1, PL2 | `grep -r "throttlestop\|PROCHOT\|LockPowerLimits" docs/solutions/` | `2026-02-07-throttlestop-dell-non-dell-charger-fix.md` |
 | Dell power, charger, battery throttle | same as above | same |
+| WSL, WSL2, wsl hang, sleep wake, GlobalProtect, PANGP, vmwp, vsock, dnsTunneling | `grep -r "wsl2\|vsock\|GlobalProtect\|PANGP\|dnsTunneling" docs/solutions/` | `integration-issues/wsl2-hang-after-sleep-globalprotect.md` |
+| Hyper-V, HNS, vEthernet, WslService timeout, Event 7011 | same as above | same |
 
 This prevents re-investigating solved problems. Read the doc, apply known fixes, THEN investigate if the issue is new.
 
