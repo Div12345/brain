@@ -412,7 +412,7 @@ def get_messages(ws):
             messages.push({
                 index: i,
                 role: hasUserMsg ? 'user' : 'assistant',
-                text: text.substring(0, 4000)
+                text: text
             });
         });
         return JSON.stringify(messages);
@@ -497,12 +497,35 @@ def get_status(ws):
         const userMsgs = document.querySelectorAll('[data-testid="user-message"]');
         const allMsgBlocks = document.querySelectorAll('[data-testid="user-message"], [data-testid="chat-message-text"]');
 
+        // Hash last assistant response (FNV-1a)
+        var lastHash = null;
+        var lastLen = 0;
+        const chatMsgs = document.querySelectorAll('[data-testid="chat-message-text"]');
+        if (chatMsgs.length > 0) {
+            const lastText = chatMsgs[chatMsgs.length - 1].innerText || '';
+            lastLen = lastText.length;
+            // Sample: first 500 + last 500 if > 1000, else full text
+            var sample = lastText;
+            if (lastText.length > 1000) {
+                sample = lastText.substring(0, 500) + lastText.substring(Math.max(0, lastText.length - 500));
+            }
+            // FNV-1a hash
+            var h = 0x811c9dc5;
+            for (var i = 0; i < sample.length; i++) {
+                h ^= sample.charCodeAt(i);
+                h = Math.imul(h, 0x01000193);
+            }
+            lastHash = (h >>> 0).toString(16);
+        }
+
         return JSON.stringify({
             is_generating: stopBtn !== null,
             send_button: sendBtn ? (sendBtn.disabled ? 'disabled' : 'enabled') : 'absent',
             model: modelEl ? modelEl.innerText.trim() : null,
             message_count: allMsgBlocks.length,
-            url: window.location.href
+            url: window.location.href,
+            last_response_hash: lastHash,
+            last_response_length: lastLen
         });
     })()
     """
@@ -551,7 +574,7 @@ def read_interim(ws):
         const text = lastBlock ? lastBlock.innerText.trim() : '';
 
         return JSON.stringify({
-            text: text.substring(0, 10000),
+            text: text,
             is_complete: !isGenerating,
             char_count: text.length
         });
@@ -888,7 +911,22 @@ async def list_tools() -> list[Tool]:
                         "type": "integer",
                         "description": "Only return last N messages",
                         "default": 10,
-                    }
+                    },
+                    "max_chars": {
+                        "type": "integer",
+                        "description": "Max chars per message. 0 = unlimited",
+                        "default": 0,
+                    },
+                    "offset": {
+                        "type": "integer",
+                        "description": "Character offset into message text (default: 0)",
+                        "default": 0,
+                    },
+                    "limit": {
+                        "type": "integer",
+                        "description": "Max characters to return per message (default: 0 = all)",
+                        "default": 0,
+                    },
                 },
             },
         ),
@@ -962,7 +1000,35 @@ async def list_tools() -> list[Tool]:
         Tool(
             name="claude_desktop_read_interim",
             description="Read the current (possibly incomplete) assistant response. Works during and after generation.",
-            inputSchema={"type": "object", "properties": {}},
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "offset": {
+                        "type": "integer",
+                        "description": "Character offset into message text (default: 0)",
+                        "default": 0,
+                    },
+                    "limit": {
+                        "type": "integer",
+                        "description": "Max characters to return (default: 0 = all)",
+                        "default": 0,
+                    },
+                },
+            },
+        ),
+        Tool(
+            name="claude_desktop_wait",
+            description="Wait until Claude Desktop finishes generating. Returns the response. Use after sending with wait_for_response=false.",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "timeout": {
+                        "type": "integer",
+                        "description": "Max seconds to wait for response",
+                        "default": 120,
+                    },
+                },
+            },
         ),
         Tool(
             name="claude_desktop_list_connectors",
@@ -1077,13 +1143,46 @@ async def call_tool(name: str, arguments: dict[str, Any]) -> list[TextContent]:
 
         elif name == "claude_desktop_read":
             last_n = arguments.get("last_n", 10)
+            max_chars = max(0, arguments.get("max_chars", 0))
+            offset = max(0, arguments.get("offset", 0))
+            limit = max(0, arguments.get("limit", 0))
             messages = get_messages(ws)
+            selected = messages[-last_n:] if last_n else messages
+
+            # Add metadata and apply max_chars/offset/limit
+            for msg in selected:
+                text = msg.get("text", "")
+                total = len(text)
+                msg["total_chars"] = total
+
+                # Apply max_chars truncation first (if set)
+                if max_chars > 0:
+                    text = text[:max_chars]
+                    effective_total = len(text)
+                    msg["is_truncated"] = effective_total < total
+                else:
+                    effective_total = total
+                    msg["is_truncated"] = False
+
+                # Apply offset/limit on the (possibly truncated) text
+                if limit > 0:
+                    msg["offset"] = offset
+                    chunk_end = min(offset + limit, effective_total)
+                    text = text[offset:chunk_end]
+                    msg["has_more"] = chunk_end < effective_total
+                    msg["is_truncated"] = msg["is_truncated"] or msg["has_more"]
+                else:
+                    msg["offset"] = 0
+                    msg["has_more"] = False
+
+                msg["text"] = text
+
             return [
                 TextContent(
                     type="text",
                     text=json.dumps(
                         {
-                            "messages": messages[-last_n:] if last_n else messages,
+                            "messages": selected,
                             "total": len(messages),
                         }
                     ),
@@ -1152,8 +1251,59 @@ async def call_tool(name: str, arguments: dict[str, Any]) -> list[TextContent]:
             return [TextContent(type="text", text=json.dumps(result))]
 
         elif name == "claude_desktop_read_interim":
+            offset = max(0, arguments.get("offset", 0))
+            limit = max(0, arguments.get("limit", 0))
             result = read_interim(ws)
+            text = result.get("text") or ""  # Handles None
+            total = len(text)
+            result["total_chars"] = total
+
+            # Apply offset/limit chunked read
+            if limit > 0:
+                chunk_end = min(offset + limit, total)
+                result["text"] = text[offset:chunk_end]
+                result["offset"] = offset
+                result["has_more"] = chunk_end < total
+                result["is_truncated"] = result["has_more"]
+            else:
+                result["text"] = text
+                result["offset"] = 0
+                result["has_more"] = False
+                result["is_truncated"] = False
             return [TextContent(type="text", text=json.dumps(result))]
+
+        elif name == "claude_desktop_wait":
+            timeout = arguments.get("timeout", 120)
+            generating = is_generating(ws)
+            start_time = time.time()
+
+            if generating:
+                response_text = wait_for_response(ws, timeout)
+            else:
+                # Not generating - return last assistant message
+                messages = get_messages(ws)
+                response_text = ""
+                for msg in reversed(messages):
+                    if msg.get("role") == "assistant":
+                        response_text = msg.get("text", "")
+                        break
+
+            waited = round(time.time() - start_time, 1)
+            text_len = len(response_text) if response_text else 0
+
+            return [
+                TextContent(
+                    type="text",
+                    text=json.dumps(
+                        {
+                            "response": response_text,
+                            "waited_seconds": waited,
+                            "response_length": text_len,
+                            "was_generating": generating,
+                        }
+                    ),
+                )
+            ]
 
         elif name == "claude_desktop_list_connectors":
             result = list_connectors(ws)
